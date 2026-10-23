@@ -1,0 +1,60 @@
+\section{Evidence supporting the design}\label{sec:evidence}
+This section summarizes the existing evidence and its limits. The s120 SINTEF audit checked 364 linked official route files and 468 local MAMUT incumbents. Every candidate passed each of the 7 tested numerical recipes. All 133,115,068 entries of the 468 matrices agreed among the tested construction methods on the recorded host. Rounding the exact-binary objective once changes 397 of the 468 serialized local costs. These are observed corpus results, not proof that all possible routes have identical feasibility under every recipe or that SINTEF's private arithmetic has been identified \autocite{onyrSintefAudit2026}.
+
+The audit also separates source-association issues from arithmetic. Ten table claims had explicit source warnings with higher linked alternatives, and \id{R1_10_7} retained an unresolved table/link discrepancy. Two official route candidates, \id{R1_10_3} and \id{R1_10_6}, improved on the local incumbents under the compared canonical and exact recipes. Compact or incomplete downloaded route headers require normalization in derived records while preserving raw source bytes. These curation tasks remain outside the specification draft.
+
+Objective-only timings on 12 stratified 1000-customer SINTEF instances distinguish arithmetic from implementation cost. Starting from loaded matrices and routes, mean microseconds per solution were 44.9 for canonical flat Python, 95.2 for a generator-based \id{math.fsum}, 326.5 for exact scaled Python integers and 2066.8 for exact \id{Fraction}. With gathered/preconverted operands, the corresponding means were 19.1, 11.1, 30.7 and 1109.7. These 2 fresh-process measurements exclude loading, temporal checks and preparation. The preparation itself averaged 224.2 ms per instance and included a full-matrix scale scan. The experiment measures no LP, pricing, dominance or complete proof performance \autocite{onyrSintefRuntime2026}.
+
+These observations support making exactness an outcome contract with alternative efficient implementations. They do not justify requiring generic rational arithmetic inside every solver. The exact-integer results also show why a \id{Fraction} microbenchmark is not a universal cost estimate for exact binary evaluation. An integration pilot is still required before estimating certification overhead for an existing BPC engine.
+
+\section{Conformance and reproducibility}\label{sec:conformance}
+This section defines the evidence needed for implementation review. A conforming evaluator \must{} identify the profile and supported domain and agree with its objective and feasibility semantics. It \must{} fail explicitly on unsupported identities, malformed instances, missing dependencies and arithmetic/resource errors. The order or wording of reported validation errors is not standardized here. An invalid or inconclusive result carries no accepted authoritative objective.
+
+The companion tests cover original-token parsing, binary64 versus decimal interpretation, integer/grid eligibility, structural coverage, route-list ordering, flat versus grouped rounding, depot/service/window boundaries, overflow, exact result encoding and display collisions. They include exact midpoint quantization and a large-value witness where sequential binary64 loses increments. These synthetic fixtures deliberately exercise boundaries that observed incumbents may not reach. They do not replace a complete family audit or certify a native implementation's full input domain.
+
+\begin{table}[htbp]
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5cm}XX@{}}
+\toprule
+Synthetic operands or condition & Exact evaluation & Other declared evaluation\\
+\midrule
+Binary64 $2^{53},1,1$ in one flat sum & $2^{53}+2$ & Sequential flat returns $2^{53}$.\\
+Same travel sequence, final deadline $2^{53}$ & Exact-binary infeasible & Rounded forward timing accepts.\\
+Tokens \id{0.33}, \id{0.56}, \id{0.11}, final deadline 1 & Exact-binary infeasible & Exact-decimal accepts at 1.\\
+Costs $1$ and $1+2^{-54}$ & Strictly different keys & Both compatibility costs round to 1.\\
+Exact decimal midpoint 1.005 at 2 places & Nearest-even returns 1.00 & No binary64 conversion is part of this decimal quantization.\\
+\bottomrule
+\end{tabularx}
+\caption{Selected conformance witnesses. Travel sequences can be embedded in a depot-to-depot route with zero remaining arcs and sufficiently wide other windows. These are designed examples, not measured BKS feasibility flips.}
+\end{table}
+
+Before a production implementation claims conformance, it \should{} compare with the reference on full retained-candidate corpora and generated boundary cases, then record its toolchain and independent-process reproduction. Cross-platform claims require actual cross-platform evidence. Bitwise agreement for the materialized inputs and rounded profiles, and exact agreement for the exact outputs, are stronger checks than matching formatted decimal displays. Metamorphic checks \should{} include route-list permutation invariance for exact profiles and scaled-integer/rational equivalence when eligibility is proved.
+
+The execution record \must{} distinguish raw instance identity, semantic matrix identity, evaluator source identity and runtime identity. A successful rerun under a frozen environment supports reproducibility of that run. It does not establish unmeasured equivalence with another profile, another platform or an unavailable upstream evaluator.
+
+\section{Adoption and migration sequence}\label{sec:migration}
+This section proposes the steps that follow review, before publishing a changed authority. First approve the core semantics, profile registry, family objective/unit declarations, materialization policy and exact result encoding. Freeze this specification and its fixtures with immutable identities. Decide separately which library release exposes the implementations and which benchmark revisions adopt them.
+
+Next publish per-instance manifests and complete eligibility/materialization audits. Preserve existing instances, candidate routes, old evaluated costs, source records and proof claims. Evaluate all retained candidates under each new authoritative revision and select incumbents with its exact key. Checking only current winners cannot recover a better historically displaced candidate, so incomplete candidate history must be recorded explicitly.
+
+Then update the library, caches, BKS serializers, website and solver adapters together. Validate authoritative metadata and the compatibility \id{cost} projection throughout. Preserve frozen compatibility evaluation for historical records. A transitional reader \may{} display unversioned legacy records as historical records, but \mustnot{} infer that they satisfy the new authority. Missing profile metadata is not permission to apply the newest package default.
+
+Finally publish a migration report with feasibility changes, exact ordering changes, display changes, coverage denominators, unresolved curation issues and proof-review outcomes. Maintain external historical references separately from newly evaluated records. An adopted specification alone does not recertify any optimum. This draft performs none of these production migration steps.
+
+\section{Decisions and open problems}\label{sec:open}
+This section makes the remaining review obligations explicit. The s121 discussion settles 2 design choices for this draft: the first version is static, and its retained instance semantics are binary64, with exact-binary evaluation by default for fractional families and separately identified grid alternatives. The following items remain open before adoption.
+
+\begin{enumerate}
+\item Matrix authority and distribution. We propose publishing authoritative semantic digests for all materialized matrices, with pinned recipes for reconstruction. Review must decide where coordinate-derived matrices or their verified materializations are archived, how the large omitted Mamut sidecars are obtained, and what environment evidence is sufficient for regeneration. A pinned recipe alone does not demonstrate cross-platform bitwise equality.
+\item Release scope. The specification is written before implementation. Decide whether v0.13 delivers these new static profiles and result metadata or first exposes them under a staged compatibility release. That decision is separate from the historical TD restoration question.
+\item Family acceptance. Audit full integer/grid eligibility, confirm objectives, units and fleet bounds, and validate every new per-instance manifest. The first-row storage audit is insufficient to certify all matrix entries or all historical constraints. Correct the existing Poryos/Mamut README statement that 3-decimal values are exact in binary64. Exact scale-1000 representation applies to the decimal-grid interpretation, which is a separately identified alternative under this draft.
+\item Metadata integration. Confirm the proposed \id{metadata.standard} layout against the existing models, contribution interfaces and website consumers. Decide whether nullable compatibility \id{cost} is supported generally or whether adopted family domains must instead guarantee a finite projection. Exact metadata remains authoritative in either choice.
+\item Candidate and source history. Determine the available coverage of displaced candidates, repair derived imported identifiers, investigate the unresolved SINTEF table/link association, and consider the 2 better official candidates after the authority is adopted. Preserve downloaded originals.
+\item Proof assurance. Define migration labels for historical \id{optimal} flags, inventory available certificates and solver tolerances, and pilot safe bounds/pricing with an actual routing BPC engine. Objective evaluation timings cannot settle proof overhead or the availability of a rigorous gap.
+\item Implementation portability and efficiency. Validate a native dyadic accumulator, choose verified range checks, and measure complete checking and integration costs. Subnormal and boundary behavior must remain part of conformance even if common benchmark instances never trigger them.
+\end{enumerate}
+
+\section*{Authorship, provenance and review}
+The author order and ORCID identifiers are copied from the MAMUT-routing project citation metadata. This draft has not been reviewed or approved by every listed author. Its author affiliations are short forms of that source metadata, following the report collection's layout. Local Worklog discussions and session logs provide decision provenance, while the cited source revisions and investigation artifacts support numerical and historical claims.
+
+AI assistance was used to inspect the recorded sources, draft the specification and prepare the executable companion. Human review of the technical choices, authorship, source attribution and final document remains pending. The draft does not state that an author has already reviewed or accepted these outputs.

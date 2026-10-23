@@ -1,0 +1,47 @@
+{
+  "num_customers": 2,
+  "depot": 0,
+  "num_vehicles": null,
+  "vehicle_capacity": 2,
+  "demands": [
+    0,
+    1,
+    1
+  ],
+  "arc_costs": [
+    [
+      0,
+      0.1,
+      0.3
+    ],
+    [
+      0.1,
+      0,
+      0.2
+    ],
+    [
+      0.3,
+      0.2,
+      0
+    ]
+  ],
+  "time_windows": [
+    [
+      0,
+      10
+    ],
+    [
+      0,
+      10
+    ],
+    [
+      0,
+      10
+    ]
+  ],
+  "service_times": [
+    0,
+    0,
+    0
+  ]
+}

@@ -1,0 +1,92 @@
+\section{Authoritative results, BKS and website values}\label{sec:results}
+This section defines what a result records and what the ecosystem compares. A BKS is an accepted incumbent for one benchmark revision, objective and numerical profile. It is not an optimality certificate by itself. Each BKS retains a top-level \id{cost} field for existing clients and website display. The authoritative numerical value is stored in metadata together with its contract identity. Ranking \mustnot{} use the compatibility \id{cost} field or a 2-decimal website string.
+
+\subsection{Exact encoding and display}
+This draft selects a single canonical exact encoding: an object with \id{numerator} and \id{denominator} strings. Each string contains a base-10 integer without leading plus or leading zeros. The denominator is strictly positive and the fraction is reduced. Zero has numerator string \id{"0"} and denominator string \id{"1"}. A nonzero negative numerator is allowed for general bound metadata. Feasible routing costs remain nonnegative. The reader \must{} reject noncanonical fractions, rather than silently assigning another exact byte identity to the same canonical value.
+
+Numerator/denominator storage works for dyadic, decimal-grid and arbitrary rational results. Exact terminating decimal strings and scaled integers are possible derived views, but this version does not store multiple competing authoritative encodings. Strings avoid forcing arbitrary-size integers through clients that interpret every JSON number as binary64. Conversion to a finite-precision Decimal context is not required to read or compare the authoritative value \autocite{brayJSON2017,pythonFractions2026}.
+
+For an exact profile, the top-level \id{cost} is $\RoundBinary(C)$, rounded once from the authoritative exact total with ties to even. It is serialized as a finite round-trip JSON number, with positive zero. For a rounded profile it is the final binary64 objective already defined by that profile. In the general case where an exact total cannot round to a finite binary64 value, this draft requires \id{cost:null} with an explicit \id{display_overflow} flag, while retaining the exact metadata. Current family adoption should verify that this exception is unnecessary for their accepted results. Whether existing clients can support nullable display values remains a release issue.
+
+A website that shows $d$ decimal places \must{} derive its display from $Q_d(C)$ with nearest-even ties, rather than decimal-rounding the already rounded \id{cost}. This avoids a second rounding changing the displayed decimal. The reference \id{display_decimal} implements the rule. Imported historical table values remain separate source claims, with their original precision and rounding convention recorded when known. This website rule does not assert SINTEF's undocumented tie-breaking behavior.
+
+\subsection{Required provenance envelope}
+The proposed envelope lives at \id{metadata.standard}. Its field names are a draft integration proposal and are not asserted to be accepted by current library schemas. A conforming new result \must{} include the following fields, in addition to its routes and compatibility \id{cost}:
+
+\begin{longtable}{@{}p{4.2cm}p{11.4cm}@{}}
+\toprule
+Field & Meaning and required value\\
+\midrule
+\endhead
+\id{specification} & Exact specification identifier, here \id{mamut-static/0.1-draft}.\\
+\id{benchmark_revision} & Immutable family revision identifier selected by its manifest. A library version alone is insufficient.\\
+\id{manifest_sha256} & SHA-256 of the complete UTF-8 manifest bytes. The manifest does not contain its own hash.\\
+\id{profile} & Full selected integrated profile identifier. Unknown identifiers are unsupported, without fallback.\\
+\id{objective} & \id{MonoCost} or \id{HierarchicalVehicleCost}.\\
+\id{num_routes} & Exact nonnegative structural integer, checked against the routes.\\
+\id{authoritative_cost} & Reduced numerator/denominator object containing the profile's authoritative objective value.\\
+\id{routes_sha256} & SHA-256 of the canonical route stream for exact/canonical profiles, or submitted-order route stream for submitted-flat.\\
+\id{evaluation} & Checker name, source revision or source-file hash, runtime/environment identity, and verification status. This describes the actual evaluator invocation.\\
+\id{display_overflow} & Boolean. True exactly when \id{cost} is null because binary64 display overflowed.\\
+\id{assurance} & Incumbent verification and solver/proof claims as defined in Section~\ref{sec:proof}. Unknown source details are explicit null values.\\
+\bottomrule
+\end{longtable}
+
+The manifest \must{} record the family and revision, problem type, objective, profile, cost/time units, exact instance file SHA-256, all required sidecar identities, materialization recipe and semantic matrix digest, generation provenance and the allowed feature set. The manifest's raw hash binds its remaining constraints and choices to the result. A published family manifest \may{} reference per-instance manifests by hash. An instance name is informative within that identity chain, never the sole input identity.
+
+The route-digest stream is ASCII \id{MAMUT-ROUTES-v1}, newline, the number of routes, newline, then one line per route: its length, a colon, its customer indices separated by commas, and newline. Integers use base 10 without leading zeros. Depot endpoints are implicit. Route order is the one prescribed by the profile. Empty routes have already been rejected. Raw submitted files \should{} also be preserved by byte hash when they serve as external provenance.
+
+The directory's generated \id{example-result.json} and \id{example-manifest.json} provide a complete synthetic example with real hashes, rather than placeholders that resemble verified production identities. The normalized example instance is also provided. The example result's assurance explicitly identifies it as a synthetic fixture, without a solver or optimality claim.
+
+\begin{algorithm}[htbp]
+\caption{Serialize a valid authoritative result}
+\begin{algorithmic}[1]
+\Require Valid evaluated routes, authoritative rational cost $C$, manifest, profile
+\State Reduce $C=p/q$ with $q>0$ and $\gcd(|p|,q)=1$
+\State Encode $p$ and $q$ as canonical decimal integer strings
+\State $\widehat C\gets\RoundBinary(C)$ once, with ties to even
+\State Set compatibility \id{cost} to finite $\widehat C$, or null on overflow
+\State Attach manifest hash, profile, objective, route count and route-stream hash
+\State Attach actual evaluator identity and separate incumbent/proof assurance
+\State \Return result envelope, preserving source provenance separately
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Checking supplied values and comparing incumbents}
+A supplied authoritative cost is an assertion. A checker or result validator \must{} recompute feasibility and cost under the declared authority and compare the exact value, route count, profile and bound input identities. A mismatch rejects the result envelope. The routes can still be investigated separately as a candidate, but the inconsistent record is not a verified result. The compatibility \id{cost} \must{} agree with its specified rounded projection. Historical costs \may{} be retained in a separate source-provenance record instead of being overwritten.
+
+Candidates and incumbents \must{} have the same benchmark revision, interpreted inputs, objective and authority before an improvement comparison. For exact profiles compare reduced rational costs directly, with the vehicle-count tier where applicable. Distinct exact values can round to the same binary64 \id{cost} and the same website display. Such a collision \mustnot{} turn a strict improvement into a tie. For rounded profiles compare their authoritative final rounded values under the declared operation sequence.
+
+Website gaps and experiment reference scores \must{} identify the reference revision and use the authoritative values. For a mono-cost minimization reference $R>0$, a signed reference deviation can be computed exactly as $100(C-R)/R$ before display rounding. This is a deviation from a stated reference, not automatically a certified optimality gap. For hierarchical objectives, a distance-only comparison is meaningful within a fixed vehicle-count tier. A different tier \must{} be shown as a different hierarchical outcome, without hiding it in a scalar percentage. Zero denominators require an explicit undefined state or a separately defined metric.
+
+\section{Solver arithmetic and proof assurance}\label{sec:proof}
+This section separates a checked incumbent from an optimality guarantee. The target profile defines the problem independently of search arithmetic. Binary64 or compensated search \may{} still target the exact-binary problem. To establish optimality, however, a proof must bound that same target problem. Merely recording tolerances or applying accurate final summation does not make unsafe search decisions valid.
+
+\begin{table}[htbp]
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5.6cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Assurance label & Evidence required\\
+\midrule
+\id{incumbent-verified} & The selected authoritative checker accepts the routes and verifies the exact cost and input identities.\\
+\id{solver-reported-optimal} & A recorded solver reports optimality or zero gap under its settings. This claim can coexist with a checked incumbent without establishing a rigorous bound.\\
+\id{rigorous-gap} & An independently justified lower bound applies to the same target problem and an authoritative feasible upper bound establishes the stated gap.\\
+\id{numerically-certified-optimal} & A valid lower bound closes the gap under a justified criterion, with the proof method and verification outcome recorded.\\
+\bottomrule
+\end{tabularx}
+\caption{Different claims about a result. Incumbent verification and source-reported solver claims are stored separately, rather than collapsed into one ambiguous \id{optimal} boolean.}
+\end{table}
+
+For minimization, exact incumbent verification gives a feasible upper bound $U$. A rigorous lower bound $L$ for the same objective gives $L\leq z^*\leq U$. A numerical Branch-and-Price-and-Cut (BPC) run needs safe pricing, dominance, cuts, branching, pruning and bound treatment to justify the left inequality. A final route checker establishes only the right inequality. Rounding column costs or suppressing a feasible pricing label can invalidate a bound even when the returned routes pass final checking.
+
+One can combine approximate search with exact or conservatively bounded proof-critical computations. As an illustration, for a basic set-partitioning model restricted to $k$ routes, suppose a valid global pricing bound establishes
+\[
+c_r-\sum_{i\in r}\pi_i\geq-\eta\quad\text{for every feasible route }r,\qquad\eta\geq0.
+\]
+Then $L=\sum_i\pi_i-k\eta$ is a valid lower bound for that fixed-fleet model. Checking only the route returned by an approximate pricer does not establish the premise. A full BPC formulation must include its cuts and branching terms. Numerically exact BPC for bin packing provides a related example of safe dual bounds and fixed-point pricing, rather than evidence that a routing implementation is automatically certified \autocite{baldacciNumericallyExact2024}. SCIP likewise documents a mixed approach to exact solving with explicit requirements on participating components \autocite{scipExact2026}.
+
+If every fixed-fleet objective belongs to a known lattice of spacing $\delta>0$, a rigorous $L>U-\delta$ proves optimality: any better feasible value would be at most $U-\delta$. A conventional tolerance such as $10^{-6}$ does not automatically close a much finer binary lattice. For a hierarchical objective, a proof must also establish the minimal vehicle-count tier before closing the distance gap at that tier. A certified positive gap is a valid outcome when strict closure is unavailable.
+
+The \id{assurance} record \must{} distinguish incumbent verification, source-reported claim, and any verified bound or proof. It \must{} identify target profile and inputs, solver/version, search arithmetic, numerical tolerances or explicit unknowns, source log identity, bound value and bound contract, proof method or certificate identity, verifier and status. Absent proof evidence \mustnot{} be represented as certified optimality. Search, checking, certification and end-to-end runtimes \should{} be recorded separately with timer scopes. Reporting these scopes is essential when comparing methods that provide different assurance.
+
+An archived proof for a rounded-cost or other interpretation remains attached to that model. Reevaluating its incumbent under the new exact profile can establish a new feasible upper bound, but does not transfer its lower bound or optimality claim. Publication provenance and the original claim remain preserved without silently upgrading their numerical assurance.

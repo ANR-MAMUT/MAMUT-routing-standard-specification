@@ -1,0 +1,47 @@
+{
+  "routes": [
+    [
+      1,
+      2
+    ]
+  ],
+  "cost": 0.6,
+  "metadata": {
+    "standard": {
+      "specification": "mamut-static/0.1-draft",
+      "benchmark_revision": "synthetic-v1",
+      "manifest_sha256": "e7f02127bcef2e98a0ce36da398b70e7e6e0903b9b9f81a1fda566390100197d",
+      "profile": "binary64-exact-v1",
+      "objective": "MonoCost",
+      "num_routes": 1,
+      "authoritative_cost": {
+        "numerator": "21617278211378381",
+        "denominator": "36028797018963968"
+      },
+      "routes_sha256": "2e8908377fb5e4630b6279d2df29524ba7e771960c9f37a341bc8b47fb7c7191",
+      "evaluation": {
+        "checker": "src/reference.py",
+        "source_sha256": "8091956cafa67d1e0fe7740bcdedd1d1316972b32162e7b9ce685ea24452ac52",
+        "runtime": {
+          "python": "3.13.13 (main, Apr  7 2026, 18:19:01) [GCC 15.2.0]",
+          "platform": "Linux-6.18.38-x86_64-with-glibc2.42"
+        },
+        "verification_status": "evaluated-by-reference"
+      },
+      "display_overflow": false,
+      "assurance": {
+        "incumbent_verification": "checked-by-reference",
+        "source_reported_claim": null,
+        "solver": {
+          "name": null,
+          "version": null,
+          "search_arithmetic": null,
+          "tolerances": null
+        },
+        "lower_bound": null,
+        "proof": null,
+        "note": "Synthetic specification fixture. No solver run or optimality claim."
+      }
+    }
+  }
+}

@@ -1,0 +1,81 @@
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{mathtools,amssymb}
+\usepackage{booktabs,longtable,tabularx,array}
+\usepackage{algorithm,algpseudocode,listings,csquotes,xurl}
+\usepackage[section]{placeins}
+\usepackage[backend=biber,style=alphabetic,sorting=none,maxbibnames=7,minbibnames=7,maxcitenames=2]{biblatex}
+\addbibresource{biblio.bib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{etoolbox}
+\makeatletter
+% Use the existing report workaround for finite longtable footer shrinkage.
+\patchcmd{\LT@output}{\vss}{\vskip\z@ \@plus 1fil \@minus \textheight}{}{}
+\patchcmd{\LT@output}{\vss}{\vskip\z@ \@plus 1fil \@minus \textheight}{}{}
+\makeatother
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{1em}
+\setlength{\emergencystretch}{2em}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\RoundBinary}{\operatorname{RN}_{64}}
+\newcommand{\fl}{\operatorname{fl}_{64}}
+\newcommand{\id}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\must}{\textsc{must}}
+\newcommand{\mustnot}{\textsc{must not}}
+\newcommand{\may}{\textsc{may}}
+\newcommand{\should}{\textsc{should}}
+\lstset{basicstyle=\ttfamily\footnotesize,columns=fullflexible,keepspaces=true,frame=single,breaklines=true,showstringspaces=false,tabsize=4}
+\title{MAMUT-routing Standard Specification\\[0.7ex]\large Numerical semantics for static CVRP and VRPTW benchmarks}
+\author{\normalsize Adrien Pichon\textsuperscript{1}\quad Florian Rascoussier\textsuperscript{2,3}\\
+\normalsize Romain Billot\textsuperscript{2}\quad Lina Fahed\textsuperscript{2}\quad Alexandru-Liviu Olteanu\textsuperscript{1}\\
+\normalsize Marc Sevaux\textsuperscript{1}\quad Christine Solnon\textsuperscript{3}\\[0.7ex]
+\small \textsuperscript{1}Université Bretagne Sud, Lab-STICC, France\\
+\small \textsuperscript{2}IMT Atlantique, Lab-STICC, France\\
+\small \textsuperscript{3}INSA Lyon, Inria, CITI, France}
+\date{Review draft 0.1, 23 October 2026}
+\hypersetup{pdftitle={MAMUT-routing Standard Specification: Static CVRP and VRPTW},pdfauthor={Adrien Pichon, Florian Rascoussier, Romain Billot, Lina Fahed, Alexandru-Liviu Olteanu, Marc Sevaux, Christine Solnon}}
+\begin{document}
+\maketitle
+\begin{abstract}
+We specify how static MAMUT-routing instances acquire numerical meaning, how solutions are checked and ranked, and how authoritative results are preserved. The specification separates generation, instance, evaluation and result semantics. The standard retains binary64 interpretation after generation or matrix rederivation. Exact evaluation then operates on those finite values, including time-window feasibility, without intermediate rounding. Integer-valued families admit an equivalent integer implementation. Decimal and decimal-grid interpretations remain explicitly identified alternatives. Each benchmark revision selects its authority, while solvers may use different arithmetic internally. We provide pseudocode, an executable Python reference, conformance examples and proposed result metadata. This document is a draft for review before library changes or incumbent migration.
+\end{abstract}
+
+\noindent Draft status: requirements below define the proposed static contract. They do not assert adoption, library support or coauthor approval. Profile names and the metadata layout are proposed identifiers. Time-dependent evaluation requires a separate extension.
+
+\begin{center}
+\small
+\begin{tabular}{ll}
+\toprule
+Author & ORCID identifier\\
+\midrule
+Adrien Pichon & \href{https://orcid.org/0009-0005-8630-3962}{0009-0005-8630-3962}\\
+Florian Rascoussier & \href{https://orcid.org/0009-0005-3253-9814}{0009-0005-3253-9814}\\
+Romain Billot & \href{https://orcid.org/0000-0002-2614-3822}{0000-0002-2614-3822}\\
+Lina Fahed & \href{https://orcid.org/0000-0002-7207-0580}{0000-0002-7207-0580}\\
+Alexandru-Liviu Olteanu & \href{https://orcid.org/0000-0002-0715-2168}{0000-0002-0715-2168}\\
+Marc Sevaux & \href{https://orcid.org/0000-0003-3855-9072}{0000-0003-3855-9072}\\
+Christine Solnon & \href{https://orcid.org/0000-0002-0919-496X}{0000-0002-0919-496X}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\clearpage
+\tableofcontents
+\clearpage
+\input{foundations}
+\input{contracts}
+\input{evaluation}
+\input{results}
+\input{adoption}
+\printbibliography[heading=bibintoc]
+\appendix
+\section{Executable reference and conformance examples}\label{app:reference}
+This appendix embeds the reference shipped with this draft. The Python module uses only the standard library and accepts a materialized instance in the normalized core defined in Section~\ref{sec:core}. It deliberately does not resolve production sidecars, implement a website, validate the proposed provenance envelope or emulate a complete historical release. The companion \id{src/test_reference.py} exercises the arithmetic, boundary and serialization examples. The equations and requirements define the contract if an implementation defect is discovered.
+
+\lstinputlisting[language=Python]{src/reference.py}
+\end{document}
