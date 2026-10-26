@@ -6,19 +6,22 @@ The draft separates generation, instance interpretation, evaluation and result s
 
 The top-level BKS `cost` remains a compatibility projection. Authoritative cost and profile identity belong in metadata. The draft also defines temporal feasibility, lexicographic objectives, result provenance and proof-assurance distinctions. Matrix digests, metadata names, display rounding, depot initialization and adoption arrangements are explicit draft proposals. The open-problems section distinguishes these from the decisions already settled in conversation.
 
+The inventory, numerical comparisons and objective-evaluation measurements are presented as results of this document. Local investigation pointers remain in LaTeX comments rather than public-facing prose or bibliography entries. Onyr confirmed on 26 October that v0.13 will implement the complete static specification, with breaking changes from v0.12 accepted during the standard's early development. The release-scope item remains visible among the open decisions, recording the confirmed policy and pending implementation/release obligations.
+
 ## Files
 
-- [foundations.tex](foundations.tex): scope, binary64 and JSON, the 4 contract stages.
-- [contracts.tex](contracts.tex): the 1,976-instance static inventory, generation/materialization and core input semantics.
-- [evaluation.tex](evaluation.tex): integrated profiles, family defaults, exact/rounded algorithms and equivalent integer implementations.
-- [results.tex](results.tex): authoritative metadata, BKS ranking, display, solver and proof claims.
-- [adoption.tex](adoption.tex): existing evidence, conformance, migration and open decisions.
+- [tex/foundations.tex](tex/foundations.tex): scope, binary64 and JSON, the 4 contract stages.
+- [tex/contracts.tex](tex/contracts.tex): the 1,976-instance static inventory, generation/materialization and core input semantics.
+- [tex/evaluation.tex](tex/evaluation.tex): integrated profiles, family defaults, exact/rounded algorithms and equivalent integer implementations.
+- [tex/results.tex](tex/results.tex): authoritative metadata, BKS ranking, display, solver and proof claims.
+- [tex/adoption.tex](tex/adoption.tex): existing evidence, conformance, migration and open decisions.
+- [main.tex](main.tex): document entry point and shared preamble.
 - [src/reference.py](src/reference.py): standalone standard-library numerical reference, also embedded in the PDF appendix.
 - [src/test_reference.py](src/test_reference.py): 24 boundary and conformance tests.
 - [src/make_example.py](src/make_example.py): creates the synthetic instance, manifest and result with actual hashes.
 - [src/validate_draft.py](src/validate_draft.py): checks the compiled document, recorded sources and synthetic result.
 - [provenance.json](provenance.json): source paths, revisions, decision inputs and source-file hashes.
-- [validation.json](validation.json): completed document and companion checks for this working snapshot.
+- [validation.json](validation.json): document and companion checks recorded for the earlier s121 snapshot.
 
 The reference consumes materialized instances using the existing static field names, plus explicit profile/problem/objective arguments. It is not a production sidecar loader, BKS migration, complete historical-release emulator or validator for the proposed provenance envelope. Error ordering is unspecified. Current family audits and runtime measurements are cited as existing evidence rather than rerun experiments.
 
@@ -33,4 +36,4 @@ nix develop path:./nix-dev -c bash -c 'cd mamut-routing-standard && latexmk -pdf
 nix develop path:./nix-dev -c bash -c 'cd mamut-routing-standard && python src/validate_draft.py'
 ```
 
-Build with pdfLaTeX and biblatex/biber. `provenance.json` records the consulted Worklog snapshots, source hashes and audit revisions. The recorded source paths remain external dependencies of the provenance check. The first draft is versioned in this repository. The session log is `/home/onyr/code/phd/tdvrptw-workspace/reports/sessions/2026-10-23-session-121.md`.
+Build with pdfLaTeX and biblatex/biber. `provenance.json` records the consulted Worklog snapshots, source hashes and audit revisions. The recorded source paths remain external dependencies of the provenance check. The first draft is versioned in this repository. Session logs are kept in `/home/onyr/code/phd/tdvrptw-workspace/reports/sessions/`.

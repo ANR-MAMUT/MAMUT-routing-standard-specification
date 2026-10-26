@@ -1,0 +1,98 @@
+\section{Evidence supporting the design}\label{sec:evidence}
+This section presents the corpus checks and objective-evaluation measurements supporting the design, together with their limits. We evaluate fixed candidate routes and finite matrix constructions, without new solver searches or optimality proofs.
+
+\subsection{Corpus and matrix checks}
+% Internal experiment record: /home/onyr/code/phd/numerical-checker-contracts-investigation/results/s120-sintef/protocol.json, protocol-addendum.json, sources.json, summary.json, supplementary-results.json and reproducibility.json. Frozen experiment revision: 982044f967f3a689dcd10847894bef326b8d14b8. Source corpus revision: eca336ff4b087f5c2f7b9ac7c2ab33668ff7af2b.
+We capture the official SINTEF instance and detailed-solution sources in October 2026 and compare 364 linked official route files, covering 356 distinct instances, with 468 MAMUT incumbent files from the recorded corpus snapshot. The official detailed-route coverage concerns instances with 100 to 1000 customers. The MAMUT corpus also includes the 25- and 50-customer variants. These are separate coverage denominators, rather than a claim that an official detailed route was obtained for every local instance.
+
+We evaluate each candidate with 7 numerical recipes: submitted-order flat binary64, canonical flat binary64, canonical grouped binary64, exact arithmetic over binary64 values, 128-significant-digit decimal arithmetic over the same binary64 values, and 128-significant-digit coordinate-distance arithmetic in submitted and canonical route order. The last 2 recipes change the distance source as well as the arithmetic. They are geometric diagnostics, rather than exact evaluation of the published binary64 matrix. The comparisons use no feasibility epsilon. We preserve each recipe's objective and temporal recurrence separately instead of inferring feasibility from its final objective.
+
+All 364 official route files and all 468 MAMUT incumbents pass all 7 tested recipes. We also compare every directed entry of the 468 stored matrices with the square-root construction, \id{hypot}, and 128-significant-digit decimal square roots rounded once to binary64. All 133,115,068 entries agree on the recorded x86-64 host with Python 3.13.13 and glibc 2.42. Separate fresh processes reproduce the matrix and route-result outputs byte for byte. This is recorded-environment evidence, rather than cross-platform certification.
+
+Rounding the exact-binary objective once changes 397 of the 468 serialized MAMUT costs. Hence agreement on the feasibility of the retained candidates does not imply agreement on result serialization. These observations also do not prove that every possible route has identical feasibility under the recipes or identify SINTEF's private arithmetic uniquely.
+
+% Internal source associations: /home/onyr/code/phd/numerical-checker-contracts-investigation/results/s120-sintef/source-context.json, identity-audit.json and supplementary-results.json.
+We distinguish source-association issues from arithmetic differences. Ten table claims have explicit source warnings with higher linked alternatives, and \id{R1_10_7} retains an unresolved table/link discrepancy. Two official route candidates, \id{R1_10_3} and \id{R1_10_6}, improve on the MAMUT incumbents under the compared canonical and exact recipes. Compact or incomplete downloaded route headers require normalization in derived records while preserving raw source bytes. These curation tasks remain outside the specification draft.
+
+\subsection{Objective-evaluation runtime}
+% Internal timing implementation: /home/onyr/code/phd/numerical-checker-contracts-investigation/scripts/s120_cost_runtime.py and s120_cost_runtime_validate.py. Raw results: /home/onyr/code/phd/numerical-checker-contracts-investigation/newresults/s120-cost-runtime/run1.json, run2.json, comparison.json, runtime-summary.md and timed-code-identity.json. Recorded provenance revision: f405398b66441b2e4a08d4922ca5032cc32c3fcd.
+We select 12 1000-customer SINTEF instances by crossing the C, R and RC families, types 1 and 2, and instance indices 1 and 5. We verify instance and incumbent identities against the same corpus revision before measuring complete-solution objective evaluation. The measurements use an Intel i7-12700H with Python 3.13.13, in 2 sequential fresh processes. Each instance, variant and scope has 5 warm-up calls and 9 measured blocks, with a 20 ms calibration target and randomized block order using seed 20261023. Garbage collection is disabled during measured blocks and restored afterwards. CPU affinity spans CPUs 0 to 19 without pinning, so scheduling and background load remain sources of variation.
+
+The loaded-input scope starts with binary64 matrices and canonical routes in memory. It includes route traversal and any per-call numerical conversion. The prepared-operand scope starts with gathered and preconverted arc operands. Loading, hashing, structural validation, temporal checking, geometric construction and output serialization are outside both timers. Canonical sorting is also excluded because the supplied routes are already canonical.
+
+\begin{table}[htbp]
+\small
+\begin{tabularx}{\linewidth}{@{}Xrr@{}}
+\toprule
+Objective implementation & Loaded-input mean ($\mu$s) & Prepared mean ($\mu$s)\\
+\midrule
+Canonical flat binary64 & 44.9 & 19.1\\
+Canonical grouped binary64, explicit loops & 46.7 & 24.1\\
+\id{math.fsum} & 95.2 & 11.1\\
+Exact binary64 values, Python \id{Fraction} & 2066.8 & 1109.7\\
+Exact binary64 values, scaled Python integers & 326.5 & 30.7\\
+128-significant-digit Decimal from binary64 & 878.6 & 111.1\\
+\bottomrule
+\end{tabularx}
+\caption{Mean time per complete-solution objective evaluation, with equal weight for each of the 12 instances in each of the 2 processes. These descriptive means are not confidence intervals or complete solver timings.}
+\end{table}
+
+Preparation averages 224.2 ms per instance and includes a full-matrix binary-scale scan. It is excluded from both evaluation scopes and can be amortized across repeated evaluations. All selected matrices admit scale $2^{52}$, and the sampled scaled objective totals require 67 to 68 bits. The exact scaled-integer and rational implementations return the same exact objectives. This supports considering a checked native integer implementation, without establishing a range bound for every possible route, pricing label or proof intermediate.
+
+The generator-based \id{fsum} wrapper is slower than the tight flat traversal in the loaded-input scope, while its prepared summation kernel is faster. We therefore interpret the measurements as costs of these Python implementations and data-access paths. They do not establish an intrinsic speed ordering of numerical contracts. The experiment measures no Linear Programming (LP), pricing, dominance or complete proof performance.
+
+These observations support making exactness an outcome contract with alternative efficient implementations. They do not justify requiring generic rational arithmetic inside every solver. The exact-integer results also show why a \id{Fraction} microbenchmark is not a universal cost estimate for exact binary evaluation. An integration pilot is still required before estimating certification overhead for an existing BPC engine.
+
+\section{Conformance and reproducibility}\label{sec:conformance}
+This section defines the evidence needed for implementation review. A conforming evaluator \must{} identify the profile and supported domain and agree with its objective and feasibility semantics. It \must{} fail explicitly on unsupported identities, malformed instances, missing dependencies and arithmetic/resource errors. The order or wording of reported validation errors is not standardized here. An invalid or inconclusive result carries no accepted authoritative objective.
+
+The companion tests cover original-token parsing, binary64 versus decimal interpretation, integer/grid eligibility, structural coverage, route-list ordering, flat versus grouped rounding, depot/service/window boundaries, overflow, exact result encoding and display collisions. They include exact midpoint quantization and a large-value witness where sequential binary64 loses increments. These synthetic fixtures deliberately exercise boundaries that observed incumbents may not reach. They do not replace a complete family audit or certify a native implementation's full input domain.
+
+\begin{table}[htbp]
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5cm}XX@{}}
+\toprule
+Synthetic operands or condition & Exact evaluation & Other declared evaluation\\
+\midrule
+Binary64 $2^{53},1,1$ in one flat sum & $2^{53}+2$ & Sequential flat returns $2^{53}$.\\
+Same travel sequence, final deadline $2^{53}$ & Exact-binary infeasible & Rounded forward timing accepts.\\
+Tokens \id{0.33}, \id{0.56}, \id{0.11}, final deadline 1 & Exact-binary infeasible & Exact-decimal accepts at 1.\\
+Costs $1$ and $1+2^{-54}$ & Strictly different keys & Both compatibility costs round to 1.\\
+Exact decimal midpoint 1.005 at 2 places & Nearest-even returns 1.00 & No binary64 conversion is part of this decimal quantization.\\
+\bottomrule
+\end{tabularx}
+\caption{Selected conformance witnesses. Travel sequences can be embedded in a depot-to-depot route with zero remaining arcs and sufficiently wide other windows. These are designed examples, not measured BKS feasibility flips.}
+\end{table}
+
+Before a production implementation claims conformance, it \should{} compare with the reference on full retained-candidate corpora and generated boundary cases, then record its toolchain and independent-process reproduction. Cross-platform claims require actual cross-platform evidence. Bitwise agreement for the materialized inputs and rounded profiles, and exact agreement for the exact outputs, are stronger checks than matching formatted decimal displays. Metamorphic checks \should{} include route-list permutation invariance for exact profiles and scaled-integer/rational equivalence when eligibility is proved.
+
+The execution record \must{} distinguish raw instance identity, semantic matrix identity, evaluator source identity and runtime identity. A successful rerun under a frozen environment supports reproducibility of that run. It does not establish unmeasured equivalence with another profile, another platform or an unavailable upstream evaluator.
+
+\section{Adoption and migration sequence}\label{sec:migration}
+This section proposes the steps that follow review, before publishing a changed authority. First approve the core semantics, profile registry, family objective/unit declarations, materialization policy and exact result encoding. Freeze this specification and its fixtures with immutable identities. Version 0.13 will implement the complete static specification, with breaking changes from v0.12 accepted. Benchmark revision adoption and migration execution remain separate actions that require explicit records.
+
+Next publish per-instance manifests and complete eligibility/materialization audits. Preserve existing instances, candidate routes, old evaluated costs, source records and proof claims. Evaluate all retained candidates under each new authoritative revision and select incumbents with its exact key. Checking only current winners cannot recover a better historically displaced candidate, so incomplete candidate history must be recorded explicitly.
+
+Then update the library, caches, BKS serializers, website and solver adapters together. Validate authoritative metadata and the compatibility \id{cost} projection throughout. Preserve frozen compatibility evaluation for historical records. A transitional reader \may{} display unversioned legacy records as historical records, but \mustnot{} infer that they satisfy the new authority. Missing profile metadata is not permission to apply the newest package default.
+
+Finally publish a migration report with feasibility changes, exact ordering changes, display changes, coverage denominators, unresolved curation issues and proof-review outcomes. Maintain external historical references separately from newly evaluated records. An adopted specification alone does not recertify any optimum. This draft performs none of these production migration steps.
+
+\section{Decisions and open problems}\label{sec:open}
+% Internal decision record: /home/onyr/code/phd/tdvrptw-workspace/reports/plans/21-mamut-routing-lib-v013-plan.md, D13/D14 and OQ4. User ruling recorded on 2026-10-26 in session s121.
+This section records confirmed design choices and the remaining review obligations. The first version is static and retains binary64 instance semantics, with exact-binary evaluation by default for fractional families and separately identified grid alternatives. Version 0.13 will implement the complete specification, with breaking changes from v0.12 accepted during the standard's early development. We retain the release-scope item below so its implementation and release obligations remain visible.
+
+\begin{enumerate}
+\item Matrix authority and distribution. We propose publishing authoritative semantic digests for all materialized matrices, with pinned recipes for reconstruction. Review must decide where coordinate-derived matrices or their verified materializations are archived, how the large omitted Mamut sidecars are obtained, and what environment evidence is sufficient for regeneration. A pinned recipe alone does not demonstrate cross-platform bitwise equality.
+\item Release scope (policy confirmed, implementation pending). This specification is drafted before v0.13, which will implement it in full. Breaking changes from v0.12 are accepted because the MAMUT-routing standard is in an early development phase. Full implementation and conformance review, downstream migration guidance and a visible breaking-change inventory remain release obligations. This ruling does not define the future TD extension or authorize deployment or benchmark migration by itself.
+\item Family acceptance. Audit full integer/grid eligibility, confirm objectives, units and fleet bounds, and validate every new per-instance manifest. The first-row storage audit is insufficient to certify all matrix entries or all historical constraints. Correct the existing Poryos/Mamut README statement that 3-decimal values are exact in binary64. Exact scale-1000 representation applies to the decimal-grid interpretation, which is a separately identified alternative under this draft.
+\item Metadata integration. Confirm the proposed \id{metadata.standard} layout against the existing models, contribution interfaces and website consumers. Decide whether nullable compatibility \id{cost} is supported generally or whether adopted family domains must instead guarantee a finite projection. Exact metadata remains authoritative in either choice.
+\item Candidate and source history. Determine the available coverage of displaced candidates, repair derived imported identifiers, investigate the unresolved SINTEF table/link association, and consider the 2 better official candidates after the authority is adopted. Preserve downloaded originals.
+\item Proof assurance. Define migration labels for historical \id{optimal} flags, inventory available certificates and solver tolerances, and pilot safe bounds/pricing with an actual routing BPC engine. Objective evaluation timings cannot settle proof overhead or the availability of a rigorous gap.
+\item Implementation portability and efficiency. Validate a native dyadic accumulator, choose verified range checks, and measure complete checking and integration costs. Subnormal and boundary behavior must remain part of conformance even if common benchmark instances never trigger them.
+\end{enumerate}
+
+\section*{Authorship, provenance and review}
+% Internal editorial and decision provenance: /home/onyr/code/phd/phd_note_vault/docs/WORKLOG/2026-10-20.md, 2026-10-21.md, 2026-10-22.md and 2026-10-23.md. Session record: /home/onyr/code/phd/tdvrptw-workspace/reports/sessions/2026-10-23-session-121.md. Source identities: ../provenance.json.
+The author order and ORCID identifiers are copied from the MAMUT-routing project citation metadata. This draft has not been reviewed or approved by every listed author. The corpus checks and objective-evaluation measurements are presented as part of this document, with their methods and limitations stated above. Public benchmark and software references identify the external sources used.
+
+AI assistance was used to inspect the recorded sources, draft the specification and prepare the executable companion. Human review of the technical choices, authorship, source attribution and final document remains pending. The draft does not state that an author has already reviewed or accepted these outputs.

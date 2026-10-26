@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-26",
+  "session": "s121",
+  "status": "passed",
+  "scope": "Requested Wikipedia links, compiled annotations, LaTeX diagnostics and citation resolution",
+  "added_links": [
+    "https://en.wikipedia.org/wiki/Associative_property#Nonassociativity_of_floating-point_calculation",
+    "https://en.wikipedia.org/wiki/Dyadic_rational",
+    "https://en.wikipedia.org/wiki/Fixed-point_arithmetic",
+    "https://en.wikipedia.org/wiki/IEEE_754",
+    "https://en.wikipedia.org/wiki/JSON",
+    "https://en.wikipedia.org/wiki/Rounding#Double_rounding",
+    "https://en.wikipedia.org/wiki/Rounding#Rounding_half_to_even",
+    "https://en.wikipedia.org/wiki/Serialization",
+    "https://en.wikipedia.org/wiki/Significand"
+  ],
+  "excluded_links": [
+    "cryptographic hash function",
+    "lexicographic order"
+  ],
+  "artifacts": {
+    "main.pdf": "f9d47c049b0a821ff4ee808ac67da443a94075ac5d5fa499f32df7eee3999c21",
+    "tex/foundations.tex": "ded3083a2c08bc2f56692aa4d2d2a0a9a0f6aa7868d60c30f9ffb0309e2ed529",
+    "tex/evaluation.tex": "ebe38ff1c8cb3ada20f2beba0b41f37fc6807bcf25ca5f322f819db4c3d7efb4",
+    "tex/results.tex": "eb158542fc58fc26418ed03fe54aa128b473e35c2d46cea2c306e60fe1ce0d95"
+  },
+  "full_provenance_validation": {
+    "status": "fails-on-changed-external-sources",
+    "changed_sources": [
+      {
+        "path": "/home/onyr/code/phd/phd_note_vault/docs/WORKLOG/2026-10-22.md",
+        "recorded_sha256": "e2dd65a13d4c17df1b26812522b33edab557eac1d1b46b7b3e9cd1946c0c08c2",
+        "current_sha256": "dce50a86d82ae1f6b0eae12fd6f6dc49687d965d63ea3496b11393e3d4107fa5"
+      },
+      {
+        "path": "/home/onyr/code/phd/phd_note_vault/docs/WORKLOG/2026-10-23.md",
+        "recorded_sha256": "c3e8a908466606fb4c873270b92b883637df43f88ca3bc3835540cb946273900",
+        "current_sha256": "d7b948280e4e557d66e35855c248e70ddd918b777405df1c02b738f731b71da8"
+      }
+    ],
+    "note": "Historical provenance and prior validation snapshot preserved. No arithmetic code changed."
+  }
+}

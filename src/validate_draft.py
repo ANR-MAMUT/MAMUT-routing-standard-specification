@@ -41,7 +41,7 @@ def validate():
     positions = [main.index(name) for name in full_names]
     check(len(names) == 7 and positions == sorted(positions), "author citation order")
 
-    tex = "\n".join(p.read_text() for p in ROOT.glob("*.tex"))
+    tex = "\n".join(p.read_text() for p in (ROOT / "tex").glob("*.tex"))
     bib = (ROOT / "biblio.bib").read_text()
     cited = set()
     for group in re.findall(r"\\(?:auto|text|paren)cite(?:\[[^]]*\])*\{([^}]+)\}", tex):
@@ -49,7 +49,7 @@ def validate():
     keys = set(re.findall(r"@\w+\{([^,]+),", bib))
     check(cited <= keys, "all citation keys present")
     check(len(keys) == len(re.findall(r"@\w+\{", bib)), "unique bibliography keys")
-    for path in [*ROOT.glob("*.tex"), *ROOT.glob("*.md"), *ROOT.glob("src/*.py")]:
+    for path in [*(ROOT / "tex").glob("*.tex"), *ROOT.glob("*.md"), *ROOT.glob("src/*.py")]:
         check("\u2014" not in path.read_text(), "no em-dash splices: " + path.name)
 
     for profile in ref.PROFILES:
