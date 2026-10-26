@@ -1,0 +1,189 @@
+{
+  "status": "passed-focused-migration-checks",
+  "checks": [
+    "complete original directory tree preserved",
+    "original author, author date, message and coauthor trailer preserved",
+    "current source preserved: biblio.bib",
+    "current source preserved: editorial-validation.json",
+    "current source preserved: example-instance.json",
+    "current source preserved: example-manifest.json",
+    "current source preserved: example-result.json",
+    "current source preserved: link-validation.json",
+    "current source preserved: main.tex",
+    "current source preserved: provenance.json",
+    "current source preserved: src/make_example.py",
+    "current source preserved: src/reference.py",
+    "current source preserved: src/test_reference.py",
+    "current source preserved: src/validate_draft.py",
+    "current source preserved: tex/adoption.tex",
+    "current source preserved: tex/contracts.tex",
+    "current source preserved: tex/evaluation.tex",
+    "current source preserved: tex/foundations.tex",
+    "current source preserved: tex/results.tex",
+    "current source preserved: validation.json",
+    "24 reference conformance tests pass",
+    "standalone PDF build completed",
+    "no build diagnostic: ^!",
+    "no build diagnostic: undefined references",
+    "no build diagnostic: Citation .* undefined",
+    "no build diagnostic: Overfull",
+    "no build diagnostic: Infinite glue",
+    "no biber warnings",
+    "no unresolved PDF references",
+    "standalone PDF text matches the pre-migration draft",
+    "example manifest hash",
+    "example instance hash",
+    "example reference hash",
+    "example generator hash",
+    "example authoritative value",
+    "example display projection",
+    "example routes hash",
+    "example matrix hash",
+    "announcement binary64 0.1 fraction",
+    "announcement binary64 215.359 fraction",
+    "announcement decimal-grid fraction",
+    "announcement sequential summation witness",
+    "announcement exact temporal witness",
+    "announcement rounded temporal witness",
+    "announcement exact/display collision"
+  ],
+  "check_count": 45,
+  "history_mapping": {
+    "26972706f9fec4dda1350a17c33b4f28de19494e": "3317ece848d6d24b64db58844d2bc44805c2bcc3"
+  },
+  "source_snapshot_commit": "b5ace30e31c002a3e3900bf8cc3e6a2e3e4e1c36",
+  "numerical_tests": 24,
+  "pdf_sha256": "c94002225865ec117c0e895747b83c0f51c2d90373148478b8818991105dd9ee",
+  "python": "3.13.13 (main, Apr  7 2026, 18:19:01) [GCC 15.2.0]",
+  "unchanged_current_source_files": 18,
+  "artifacts": {
+    ".gitignore": "2a9f5be2ccbdafeb7779f307ecea0bacfe4fd5316b45db7ba41a464baa897bb4",
+    "HISTORY.md": "34ab6c514edbc8716048d43b14aa12659cc540c2bea2d584266fe9ef0f53f39a",
+    "README.md": "c887f4df1ce27e4a6be9c77afb5cb22d378a08d62b575d08280c8c003cb6de38",
+    "biblio.bib": "76db2f14215a466b06671276c726dafab8e1d795540b248ee0df64dfdbd1c6b2",
+    "editorial-validation.json": "1c714ff6c3baee294e204c2cd172f1c944fd4fedec455c289aa38f2702c418c0",
+    "example-instance.json": "9f28bdca3e244bea3d6b849ae914d592ae20660503f1176c714f0e3d7c209679",
+    "example-manifest.json": "e7f02127bcef2e98a0ce36da398b70e7e6e0903b9b9f81a1fda566390100197d",
+    "example-result.json": "de6dfc7a6c0e41ee16a30a42e71009c773879995286088e3bffeddeb3064e472",
+    "link-validation.json": "4fb04446d41a04e1b114e3adbe3aac2e2db69624c584ec84c019ac5c759fc4d6",
+    "main.pdf": "c94002225865ec117c0e895747b83c0f51c2d90373148478b8818991105dd9ee",
+    "main.tex": "cde415eb6955f1146c281397b715c89dd9118c2e6f263e2c1806f47c95df4579",
+    "provenance.json": "2c129f100b1a9fe7c7011d973657013eae05b515de5430080e5b48a0131400a5",
+    "src/make_example.py": "12b5e3e80642ffdbe568694aea8289642b39e5b45dc506523548f55cf16c5c80",
+    "src/reference.py": "8091956cafa67d1e0fe7740bcdedd1d1316972b32162e7b9ce685ea24452ac52",
+    "src/test_reference.py": "4ba3f2926a2dfa907478b3289f8f14c0aea5fc7b363ba9d2e4e389e870d59764",
+    "src/validate_draft.py": "b26d0d12338b9aa906c65b08a3ce09113dfdbf52288e7c9cf0801c57c24a697b",
+    "tex/adoption.tex": "d5a3f26fbeb77638e0bbc2e2757da8b3251086c56791a1ef381524efb38bf2e9",
+    "tex/contracts.tex": "25b8887f6e065e39f387b02675cb370373846588e729f151496c396753eb7d9b",
+    "tex/evaluation.tex": "5279db2cb5f9d5c404940b40445820a50a5c0f5db9cf859c1240d440a797182a",
+    "tex/foundations.tex": "496c88a5843a3b807ba4991bdd76d6c2b63db4d1652ec5e71f95fae0d79c52af",
+    "tex/results.tex": "eb158542fc58fc26418ed03fe54aa128b473e35c2d46cea2c306e60fe1ce0d95",
+    "validation.json": "115cea46d19e19d2493854f3eba45c146ef10ebb3b4509d4a5fae2fd1238ff9e"
+  },
+  "external_provenance": {
+    "status": "historical-validator-not-passing",
+    "sources": [
+      {
+        "path": "/home/onyr/code/phd/phd_note_vault/docs/WORKLOG/2026-10-20.md",
+        "recorded_sha256": "459c7f9520c21058cd2f833463bfd66d79b6c77c81dda97972b3711c50d09f1f",
+        "current_sha256": "459c7f9520c21058cd2f833463bfd66d79b6c77c81dda97972b3711c50d09f1f",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/phd_note_vault/docs/WORKLOG/2026-10-21.md",
+        "recorded_sha256": "fe7ffb6bf15e25f9f5c1078aa0ac50e5b506e1b7e5a3d6486333a6a12f564972",
+        "current_sha256": "fe7ffb6bf15e25f9f5c1078aa0ac50e5b506e1b7e5a3d6486333a6a12f564972",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/phd_note_vault/docs/WORKLOG/2026-10-22.md",
+        "recorded_sha256": "e2dd65a13d4c17df1b26812522b33edab557eac1d1b46b7b3e9cd1946c0c08c2",
+        "current_sha256": "dce50a86d82ae1f6b0eae12fd6f6dc49687d965d63ea3496b11393e3d4107fa5",
+        "matches": false
+      },
+      {
+        "path": "/home/onyr/code/phd/phd_note_vault/docs/WORKLOG/2026-10-23.md",
+        "recorded_sha256": "c3e8a908466606fb4c873270b92b883637df43f88ca3bc3835540cb946273900",
+        "current_sha256": "d7b948280e4e557d66e35855c248e70ddd918b777405df1c02b738f731b71da8",
+        "matches": false
+      },
+      {
+        "path": "/home/onyr/code/phd/tdvrptw-workspace/reports/sessions/2026-10-20-session-119.md",
+        "recorded_sha256": "82310738fa6357cf159a583d7e55715e59661c28f5bc51db6498d029c207f31c",
+        "current_sha256": "82310738fa6357cf159a583d7e55715e59661c28f5bc51db6498d029c207f31c",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/tdvrptw-workspace/reports/sessions/2026-10-23-session-120.md",
+        "recorded_sha256": "e536082e7abaa1470b537b14283c95a88435221594e12e79907ae86009b5a04c",
+        "current_sha256": "e536082e7abaa1470b537b14283c95a88435221594e12e79907ae86009b5a04c",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/MAMUT-routing/CITATION.cff",
+        "recorded_sha256": "b4fec01946d2d356e1d57797772d3920c242549e911762ac3a9b2c2fbcbe05d3",
+        "current_sha256": "b4fec01946d2d356e1d57797772d3920c242549e911762ac3a9b2c2fbcbe05d3",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/MAMUT-routing/MAMUT-routing-lib/src/mamut_routing_lib/checker.py",
+        "recorded_sha256": "ee49bca59432c246b021c964c1a902c7a64500694d321aa5f06e825d6e54c7a5",
+        "current_sha256": "ee49bca59432c246b021c964c1a902c7a64500694d321aa5f06e825d6e54c7a5",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/MAMUT-routing/MAMUT-routing-lib/src/mamut_routing_lib/artifacts.py",
+        "recorded_sha256": "222970ded32a2ea007f5f1360805fb9592f39c1165f5d99dc383f484bf931d53",
+        "current_sha256": "222970ded32a2ea007f5f1360805fb9592f39c1165f5d99dc383f484bf931d53",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/VRPTW-benchmarks/src/vrptw_benchmarks/benchmarks/distance.py",
+        "recorded_sha256": "fdad44e02baf3dce8f82570e0b595d5e6102fcada15847893cf9c2dd63e6f2ee",
+        "current_sha256": "fdad44e02baf3dce8f82570e0b595d5e6102fcada15847893cf9c2dd63e6f2ee",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/tdvrptw-workspace/reports/audits/2026-10-21-s118-static-storage-audit/summary.json",
+        "recorded_sha256": "cfc2443956334eeef84926fedecf488c89237e2e4d548384c21c487ea6ba1b94",
+        "current_sha256": "cfc2443956334eeef84926fedecf488c89237e2e4d548384c21c487ea6ba1b94",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/tdvrptw-workspace/reports/audits/2026-10-21-s118-static-storage-audit/source-provenance.json",
+        "recorded_sha256": "e016b93511f979d901d8ac2893953a5c936aba3e98cf2b471c06d3070b74b947",
+        "current_sha256": "e016b93511f979d901d8ac2893953a5c936aba3e98cf2b471c06d3070b74b947",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/tdvrptw-workspace/reports/audits/2026-10-21-s118-static-storage-audit/verified-examples.json",
+        "recorded_sha256": "2220de9ffa523798091578c0ba89ce005f3b9713954be35345038df1ec429d91",
+        "current_sha256": "2220de9ffa523798091578c0ba89ce005f3b9713954be35345038df1ec429d91",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/report/numerical-checker-contracts/main.tex",
+        "recorded_sha256": "08b55069194d4ef2f2ca7dad8aded9d38c1e4cda096ffb6485085f4fc7d87f6f",
+        "current_sha256": "08b55069194d4ef2f2ca7dad8aded9d38c1e4cda096ffb6485085f4fc7d87f6f",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/report/paper1/main.tex",
+        "recorded_sha256": "ba317a09cacbd7fde1ad4c8f95fdc6a195374b4aafdd18a1a52b14181a90cfb6",
+        "current_sha256": "ba317a09cacbd7fde1ad4c8f95fdc6a195374b4aafdd18a1a52b14181a90cfb6",
+        "matches": true
+      },
+      {
+        "path": "/home/onyr/code/phd/report/nix-dev/flake.lock",
+        "recorded_sha256": "d1bbcdb6cf22682dca65480c0b34e7b6c6228fb558a4dd2f61b5051a59afd424",
+        "current_sha256": "d1bbcdb6cf22682dca65480c0b34e7b6c6228fb558a4dd2f61b5051a59afd424",
+        "matches": true
+      }
+    ]
+  },
+  "limitations": [
+    "Historical provenance records are preserved, including pre-existing external-source hash mismatches",
+    "No full-corpus rerun, runtime benchmark, cross-platform certification or optimality proof",
+    "No production implementation, benchmark migration, submodule integration or website change"
+  ]
+}
