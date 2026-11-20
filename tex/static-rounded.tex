@@ -1,0 +1,26 @@
+\section{Prescribed binary64 alternatives for static evaluation}\label{sec:rounded}
+This section gives complete operation sequences for the rounded profiles. First parse every arc and temporal quantity as finite binary64, normalize zero, and apply the same structural checks. Initialize each objective accumulator to positive binary64 zero. In all additions below, round to nearest binary64 with ties to even immediately after that addition. Reject an arithmetic overflow rather than returning an infinite objective.
+
+\begin{algorithm}[htbp]
+\caption{Binary64 objective modes after route validation}\label{alg:rounded-objective}
+\begin{algorithmic}[1]
+\Require Validated route set $\mathcal{S}$, enumeration $\mathbf{s}$, $c_{ij}\in\FbinNonneg$, rounded profile
+\State $\mathbf{s}_P\gets\mathbf{s}$ for submitted-flat, otherwise $\operatorname{canon}(\mathcal{S})$
+\State $T\gets+0_{64}$ \Comment{$T\in\Fbin$}
+\For{each route $\mathbf{r}$ in the sequence $\mathbf{s}_P$}
+\State $U\gets+0_{64}$ \Comment{$U\in\Fbin$}
+\For{each arc $\langle i,j\rangle$ in $\operatorname{arcs}(\mathbf{r})$}
+\If{grouped mode} \State $U\gets U\oplus_{64}c_{ij}$
+\Else \State $T\gets T\oplus_{64}c_{ij}$ \EndIf
+\EndFor
+\If{grouped mode} \State $T\gets T\oplus_{64}U$ \EndIf
+\EndFor
+\State \Return $\RatBin(T)\in\Q_{\geq0}$ \Comment{same numerical value as final $T$}
+\end{algorithmic}
+\end{algorithm}
+
+For rounded temporal feasibility, use the same service-start notation, with $t_0=e_0\in\FbinNonneg$. After predecessor $i$, compute $t_j=\max(e_j,(t_i\oplus_{64}s_i)\oplus_{64}c_{ij})$ and check $t_j\leq l_j$. The parentheses require the departure addition to round before the travel addition. Upon return from the last customer $i$, compute $t_0^{\mathrm{ret}}=\max(e_0,(t_i\oplus_{64}s_i)\oplus_{64}c_{i0})$ and check $t_0^{\mathrm{ret}}\leq l_0$. Here $s_0=0$ in the first-leg recurrence. Every addition result and accepted service-start time must remain in $\FbinNonneg$, and any overflow is rejected. Each route has an independent clock. Objective grouping does not change this clock recurrence. Maximum and comparisons select and compare the current binary64 values without an added epsilon.
+
+The grouped mode \must{} use explicit binary64 additions both inside and across routes. An implementation \mustnot{} replace them with a version-dependent language \id{sum}, parallel reduction, \id{fsum}, extended accumulator or reassociated expression. For submitted order, the original enumeration $\mathbf{s}$ is part of the evaluated solution identity and \must{} be retained alongside the mathematical route set $\mathcal{S}$. Its authoritative value can depend on both $\mathcal{S}$ and $\mathbf{s}$. Canonicalizing that file and then evaluating it as submitted order can change its authoritative value.
+
+The result fraction for a rounded profile records the exact value of its final rounded binary64 number. That encoding does not turn its internal temporal or objective operations into an exact-arithmetic profile. A result \must{} retain the profile identifier so readers can distinguish these meanings.

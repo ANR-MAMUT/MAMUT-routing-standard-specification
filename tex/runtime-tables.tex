@@ -1,0 +1,55 @@
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}Xrrrrr@{}}
+\toprule
+Objective implementation & 100 & 400 & 600 & 800 & 1000\\
+\midrule
+Submitted flat binary64 & 3.9 & 18.4 & 28.7 & 38.4 & 49.1\\
+Canonical flat binary64 & 3.9 & 18.3 & 28.6 & 38.2 & 48.7\\
+Grouped binary64, explicit loops & 4.1 & 19.1 & 29.9 & 40.0 & 51.4\\
+Grouped Python \id{sum} & 10.9 & 42.3 & 66.2 & 87.0 & 110.1\\
+\id{math.fsum} & 9.7 & 36.8 & 58.2 & 79.4 & 103.7\\
+Exact binary, Python \id{Fraction} & 205.1 & 873.0 & 1332.2 & 1763.4 & 2223.1\\
+Exact binary, scaled integers & 31.8 & 137.6 & 212.2 & 280.0 & 353.5\\
+128-digit Decimal from binary64 & 89.3 & 376.7 & 574.7 & 760.3 & 956.5\\
+128-digit coordinate Decimal cache$\dagger$ & 19.8 & 77.4 & 116.8 & 153.6 & 191.1\\
+\bottomrule
+\end{tabularx}
+\caption{Loaded matrix and routes: mean objective-evaluation time in $\mu$s per complete solution, by customer count. Each size gives equal weight to every instance and each process. $\dagger$The coordinate Decimal diagnostic uses prepared distances in both scopes and changes the distance source.}\label{tab:runtime-loaded}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}Xrrrrr@{}}
+\toprule
+Objective implementation & 100 & 400 & 600 & 800 & 1000\\
+\midrule
+Submitted flat binary64 & 2.2 & 8.3 & 12.5 & 16.5 & 20.7\\
+Canonical flat binary64 & 2.2 & 8.3 & 12.5 & 16.5 & 20.7\\
+Grouped binary64, explicit loops & 2.8 & 10.4 & 15.7 & 20.7 & 26.0\\
+Grouped Python \id{sum} & 1.7 & 5.4 & 8.0 & 10.4 & 12.9\\
+\id{math.fsum} & 1.2 & 4.5 & 6.9 & 9.3 & 11.9\\
+Exact binary, Python \id{Fraction} & 107.9 & 472.4 & 719.7 & 951.7 & 1202.5\\
+Exact binary, scaled integers & 3.5 & 13.4 & 20.1 & 26.4 & 33.3\\
+128-digit Decimal from binary64 & 12.8 & 48.5 & 72.6 & 95.7 & 119.8\\
+128-digit coordinate Decimal cache$\dagger$ & 19.8 & 77.4 & 117.1 & 153.7 & 190.7\\
+\bottomrule
+\end{tabularx}
+\caption{Prepared operands: mean objective-evaluation time in $\mu$s per complete solution, by customer count. Each size gives equal weight to every instance and each process. $\dagger$The coordinate Decimal diagnostic uses prepared distances in both scopes and changes the distance source.}\label{tab:runtime-prepared}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+Customers & Instances & Preparation (ms) & Matrix scan (ms) & Exponent $q$ & Total bits\\
+\midrule
+100 & 56 & 3.6 & 2.2 & 51, 52 & 61--63\\
+400 & 60 & 43.7 & 36.6 & 52 & 64--66\\
+600 & 60 & 95.1 & 83.9 & 52 & 65--67\\
+800 & 60 & 160.1 & 148.7 & 52 & 66--68\\
+1000 & 60 & 248.5 & 234.2 & 52 & 66--68\\
+\bottomrule
+\end{tabular}
+\caption{Preparation outside the objective timers. The full-matrix scale scan is included in preparation. Bit counts concern the observed incumbent totals at each matrix's common binary scale, rather than all possible solver intermediates.}\label{tab:runtime-preparation}
+\end{table}

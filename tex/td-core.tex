@@ -1,0 +1,48 @@
+\section{Time-dependent routing and the duration of a route}\label{sec:td-core}
+
+Two vehicles visiting the same customers in the same order can spend different lengths of time on the road if they leave the depot at different times. For a Time-Dependent Vehicle Routing Problem (TDVRP), with or without time windows, a submitted route therefore leaves a scheduling decision to the checker. For each fixed customer sequence, we choose the depot departure that minimizes the elapsed time until the vehicle returns. This duration includes travel, waiting and customer service.
+
+Materialization fixes the finite binary64 operands, and exact evaluation determines what those operands mean for a route. The proposed \id{td-binary64-exact-v1} profile applies this rule to the arc functions, horizon, windows, service durations and any fixed vehicle charge. Each interpreted binary64 operand $f$ contributes its exact value $\RatBin(f)$. All interpolation, boundary comparisons, duration minimization and solution aggregation use exact arithmetic on these values. Identifiers and counts remain structural integers. The capacity and demand fields follow the integer resource rules of Section~\ref{sec:core}. The materializer may read stored knots, derive ATFs from a compact Ichoua, Gendreau and Potvin (IGP) speed profile, or sample pinned paths through a road graph with a traffic overlay. Parameters such as a simplification tolerance apply while producing the knots. Exact interpolation then uses the published knots, including nearly flat pieces. A family can express time in milliseconds and still admit every real departure time in the feasible interval. Restricting departures to integer milliseconds would define a separate model.
+
+\paragraph{From static travel cost to TD duration.}
+Consider one customer with service-start window $[7,9]$, service duration 2, and constant travel time 2 on each leg. The depot opens at 0 and closes at 15. In static VRPTW, the earliest vehicle waits at the customer until 7, returns at 11 and has travel cost 4. Under the TD duration objective, any depot departure in $[5,7]$ avoids waiting and gives duration 6. The checker returns 5 as the earliest minimizing departure. Tightening the depot deadline to 10 makes the same route infeasible in both settings. Constant arc travel times can therefore give the same feasibility verdict with different declared objectives.
+
+\subsection{Arrival on an arc}
+
+An Arrival Time Function (ATF) $\alpha_{ij}(t)$ gives the clock time at vertex $j$ when we leave $i$ at time $t$. Travel time is $\alpha_{ij}(t)-t$. All arcs share a finite closed departure horizon $[h_0,h_1]$. Each arc has a finite sequence of knots $(x_k,y_k)$ spanning this horizon, with nondecreasing abscissas, nondecreasing ordinates and $y_k\geq x_k$. These conditions give nonnegative travel times and the First-In, First-Out (FIFO) property. In particular, departing later cannot yield an earlier arrival on the same arc.
+
+For each distinct abscissa $x$, let $y^-(x)$ and $y^+(x)$ be the first and last ordinates stored there. At $t=x$, including either endpoint of the horizon, the ATF \must{} take the value $y^-(x)$. Between consecutive distinct abscissas $x<x'$, its value at $x<t<x'$ is
+\begin{equation}\label{eq:td-arc-interpolation}
+\alpha_{ij}(t)=y^+(x)+\frac{t-x}{x'-x}\bigl(y^-(x')-y^+(x)\bigr).
+\end{equation}
+A repeated abscissa can thus encode an upward jump. Its lower ordinate is attainable at the knot, and its upper ordinate is the right-hand limit wherever a piece follows. Choosing the side of a jump requires exact equality and ordering. An arc departure outside the horizon is infeasible.
+
+\subsection{Feasible depot departures and the earliest optimum}
+
+The route vector $\mathbf r$ and its customer subsequence have the same meaning as in Section~\ref{sec:exact}. The initial depot departure $t$ belongs to $[h_0,h_1]$ intersected with the depot window $[e_0,l_0]$ when one is present. It is the instant at which the vehicle enters its first arc. As in static routing, only customers receive service and $s_0=0$. The depot window constrains the choice of $t$ directly.
+
+Starting from $t$, evaluate each arc at the departure from its tail. Upon arrival at a customer $j$ at time $u$, require $u\leq l_j$ if a window is present, and depart at $\max(u,e_j)+s_j$. Without a window, depart at $u+s_j$. Service durations are nonnegative and window bounds are inclusive. This earliest-service schedule minimizes the return time for each fixed $t$ under FIFO. On the final arc, enforce its departure horizon and, when present, the depot return deadline $l_0$. The duration ends at depot arrival. In the absence of a return deadline, the final arc can arrive after $h_1$.
+
+Let $D_{\mathbf r}$ contain the initial departures for which this forward schedule is feasible, and let $\delta_{\mathbf r}(t)$ denote its depot return time. An empty $D_{\mathbf r}$ makes the route infeasible. Otherwise the checker \must{} return the exact minimum duration and select the smallest attaining departure according to
+\begin{align}
+\Delta_{\mathbf r}^* &= \min_{t\in D_{\mathbf r}}\bigl(\delta_{\mathbf r}(t)-t\bigr), \label{eq:td-route-duration}\\
+t_{\mathbf r}^* &= \min\{t\in D_{\mathbf r}:\delta_{\mathbf r}(t)-t=\Delta_{\mathbf r}^*\}. \label{eq:td-earliest-minimizer}
+\end{align}
+
+Whenever the route is feasible, its minimum duration is attained and it has an earliest minimizing departure. Both are rational even when they have no finite binary expansion. Appendix~\ref{app:td-attainment} derives this result from the horizon, jump and window conventions above.
+
+\subsection{Results, comparisons and the displayed departure}
+
+Apply the customer coverage, capacity and fleet checks to the submitted routes. A solution $\mathcal S$ with any infeasible route is infeasible. On a feasible solution, \id{Duration} has exact value $\sum_{\mathbf r\in\mathcal S}\Delta_{\mathbf r}^*$. For \id{FleetCostDuration} add $F|\mathcal S|$ using the instance's required nonnegative fixed vehicle charge $F$ in the same units. The route departures are independently optimized in both objectives.
+
+The routes and identified instance are the input to authoritative recomputation under the declared evaluation profile. The checker \must{} compare BKS candidates by the exact solution objective under the same instance revision, objective and profile. On an exact tie it \must{} retain the currently stored incumbent. This rule uses the state of the BKS store at comparison time. Within each route, the departure tie rule in Equation~\ref{eq:td-earliest-minimizer} independently determines a unique witness.
+
+Use the exact result encoding of Section~\ref{sec:results} for the authoritative cost and for any departure published as an exact witness. An exact witness replays under the same profile to a feasible schedule with the stated minimum duration. For display, round each exact value directly to the nearest binary64 value with ties to even, following the shared overflow rule for the cost. Rounding the exact departure can move it across a feasibility boundary. A displayed departure is an approximation and carries no replay guarantee.
+
+% Nairobi evidence: 0nyr/routing-numerical-contracts at 75905c8827f959621ea808894e28136d248d2d15; manifest results/rational-panel.json, record Blauth-nairobi n=10. Record file stem b63d9f3b327372e257b1538b69524e9b353961d6abc7e4a96a1837710f6fac28. Materialized input SHA-256 6dfe07a0bad7462dac5570b6adbb2872cbed4d3a8bafe4ca3eed56168a76985a; rational result SHA-256 e65bb7e87586575a4f3780f228182f73952914e07246f204f1f21331138aca78. Replayed the earliest optimum with ncci.exact, then its own nearest binary64 value. The second-customer excess is 170302871963/174950148915532398592 ms.
+\paragraph{A displayed departure that misses the deadline.}
+In the \href{https://github.com/0nyr/routing-numerical-contracts/blob/75905c8827f959621ea808894e28136d248d2d15/results/rational-panel.json}{10-customer Blauth-Nairobi instance in the frozen route panel}, consider the customer sequence $\langle 2,1,4,9,8,10,3,6,5,7\rangle$. Although its ATF knots are in integer milliseconds, its exact earliest minimizing departure is
+\[
+t_{\mathbf r}^*=\frac{46757961125227679073}{790061513395}\ \mathrm{ms}.
+\]
+At that departure the vehicle arrives at customer 1, its second visit, exactly at the deadline of $61\,200\,000$~ms. The nearest binary64 departure has shortest round-trip spelling \id{59182684.30049512}~ms. Replaying this binary64 value under the same exact arc functions misses the deadline by approximately $9.73\times10^{-10}$~ms. The exact route remains feasible. Even a correctly rounded departure can therefore serve as a display of a feasible optimum whose schedule requires the exact departure to reproduce.

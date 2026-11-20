@@ -19,3 +19,7 @@ Commit `b5ace30` preserves the uncommitted source reorganization, first-use term
 The complete original directory, including ignored generated files, was archived locally before migration. Every file was transferred byte for byte before repository setup edits. The original report history remains intact. Historical provenance and validation records are preserved as evidence for their recorded snapshots. Pre-existing external-source hash mismatches remain explicit.
 
 No benchmark revision, BKS, production checker or website was migrated by this repository move. The document's author list remains a draft attribution, with review and approval pending.
+
+## November review draft
+
+The 20 November 2026 local review copy incorporates the later static amendments to the report checkout (including materialization, proof provenance and the native evidence appendix) and the joint static and TD draft from session 129. The LaTeX inputs, companion sources and review PDF are synchronized with the report source. The October migration and evidence records describe their original snapshots.

@@ -5,7 +5,7 @@
   "instance_name": "two-customers",
   "problem": "VRPTW",
   "objective": "MonoCost",
-  "profile": "binary64-exact-v1",
+  "default_profile": "binary64-exact-v1",
   "units": {
     "cost": "fixture-unit",
     "time": "fixture-unit"
@@ -17,15 +17,9 @@
   },
   "sidecars": [],
   "materialization": {
-    "recipe": "embedded-matrix",
+    "kind": "embedded-matrix",
     "interpretation": "binary64",
     "matrix_sha256": "ab8a8d7f8797135d5f7a232191b579112bd067db48991ccff0897d4af01f3ca5"
-  },
-  "generation": {
-    "recipe": "synthetic literal fixture",
-    "script": "src/make_example.py",
-    "script_sha256": "12b5e3e80642ffdbe568694aea8289642b39e5b45dc506523548f55cf16c5c80",
-    "seed": null
   },
   "features": [
     "single-depot",

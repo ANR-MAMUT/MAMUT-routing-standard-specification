@@ -1,0 +1,303 @@
+{
+  "checks": [
+    {
+      "check": "report source: .gitignore",
+      "pass": true
+    },
+    {
+      "check": "report source: README.md",
+      "pass": true
+    },
+    {
+      "check": "report source: figures/native-checking-by-size.pdf",
+      "pass": true
+    },
+    {
+      "check": "report source: figures/native-objective-by-size.pdf",
+      "pass": true
+    },
+    {
+      "check": "report source: figures/objective-runtime-by-size.pdf",
+      "pass": true
+    },
+    {
+      "check": "report source: main.tex",
+      "pass": true
+    },
+    {
+      "check": "report source: src/validate_evidence.py",
+      "pass": true
+    },
+    {
+      "check": "report source: tex/contracts.tex",
+      "pass": true
+    },
+    {
+      "check": "report source: tex/evidence.tex",
+      "pass": true
+    },
+    {
+      "check": "report source: tex/native-evidence.tex",
+      "pass": true
+    },
+    {
+      "check": "report source: tex/native-tables.tex",
+      "pass": true
+    },
+    {
+      "check": "report source: tex/runtime-tables.tex",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-cost-runtime/comparison.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-cost-runtime/inputs.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-cost-runtime/objective-runtime-by-size.pdf",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-cost-runtime/protocol.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-cost-runtime/report-artifacts.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-cost-runtime/run1.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-cost-runtime/run2.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-cost-runtime/runtime-tables.tex",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-cost-runtime/validation.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/build-commands.txt",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/build.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/comparison.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/conformance.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/native-checking-by-size.pdf",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/native-objective-by-size.pdf",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/native-tables.tex",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/protocol.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/report-artifacts.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/run1.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/run2.json",
+      "pass": true
+    },
+    {
+      "check": "experiment artifact: newresults/s124-native/validation.json",
+      "pass": true
+    },
+    {
+      "check": "experiment commit available",
+      "pass": true
+    },
+    {
+      "check": "independent numerical replay passed",
+      "pass": true
+    },
+    {
+      "check": "full census validated",
+      "pass": true
+    },
+    {
+      "check": "all requested sizes",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 100/from_loaded_matrix",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 100/prepared_operands_only",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 1000/from_loaded_matrix",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 1000/prepared_operands_only",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 400/from_loaded_matrix",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 400/prepared_operands_only",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 600/from_loaded_matrix",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 600/prepared_operands_only",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 800/from_loaded_matrix",
+      "pass": true
+    },
+    {
+      "check": "all 9 implementations: 800/prepared_operands_only",
+      "pass": true
+    },
+    {
+      "check": "generated tables copied exactly",
+      "pass": true
+    },
+    {
+      "check": "generated plot copied exactly",
+      "pass": true
+    },
+    {
+      "check": "evidence follows appendix declaration",
+      "pass": true
+    },
+    {
+      "check": "evidence included once",
+      "pass": true
+    },
+    {
+      "check": "evidence removed from main body",
+      "pass": true
+    },
+    {
+      "check": "corpus subsection retained",
+      "pass": true
+    },
+    {
+      "check": "runtime subsection retained",
+      "pass": true
+    },
+    {
+      "check": "conformance remains in main body",
+      "pass": true
+    },
+    {
+      "check": "historical corpus evidence preserved",
+      "pass": true
+    },
+    {
+      "check": "no unresolved references or citations",
+      "pass": true
+    },
+    {
+      "check": "no overfull boxes",
+      "pass": true
+    },
+    {
+      "check": "evidence is Appendix B in PDF",
+      "pass": true
+    },
+    {
+      "check": "complete census in PDF",
+      "pass": true
+    },
+    {
+      "check": "no unresolved PDF markers",
+      "pass": true
+    },
+    {
+      "check": "native independent replay passed",
+      "pass": true
+    },
+    {
+      "check": "native complete census",
+      "pass": true
+    },
+    {
+      "check": "native complete timing blocks",
+      "pass": true
+    },
+    {
+      "check": "native prior-results preservation",
+      "pass": true
+    },
+    {
+      "check": "native boundary suite passed",
+      "pass": true
+    },
+    {
+      "check": "native sanitizer checks passed",
+      "pass": true
+    },
+    {
+      "check": "native tables copied exactly",
+      "pass": true
+    },
+    {
+      "check": "native figure copied exactly: native-objective-by-size.pdf",
+      "pass": true
+    },
+    {
+      "check": "native figure copied exactly: native-checking-by-size.pdf",
+      "pass": true
+    },
+    {
+      "check": "native subsection included once",
+      "pass": true
+    },
+    {
+      "check": "native appendix reference resolved",
+      "pass": true
+    },
+    {
+      "check": "native experiment commit available",
+      "pass": true
+    }
+  ],
+  "checks_passed": 73,
+  "checks_total": 73,
+  "pdf_sha256": "fca09e81fcd128ddb64b21fe34bd0d2eb89ed4ab5ebe3b6239405d4c7512f574",
+  "provenance_sha256": "df31a6805f9cac51c9652211d6ca753e35a681a3c75499d860a0d5e8efc2d18d",
+  "scope": "s124 numerical-evidence integration and current PDF; historical validation/provenance files remain unchanged",
+  "status": "pass",
+  "validator_sha256": "cbbb40b988732836431dda8cedd90791b17435e96a84bba8fd248ad20b59af11"
+}

@@ -93,7 +93,7 @@ class Conformance(unittest.TestCase):
         self.assertEqual(result["num_routes"], 0)
 
     def test_start_deadline_waiting_and_return(self):
-        text = document(n=1, weights={(0, 1): 2, (1, 0): 2}, services=[1, 5],
+        text = document(n=1, weights={(0, 1): 2, (1, 0): 2}, services=[0, 5],
                         windows=[[2, 20], [10, 10]])
         i = instance(text, problem="VRPTW")
         self.assertEqual(ref.evaluate(i, [[1]])["cost"], 4)
@@ -104,10 +104,16 @@ class Conformance(unittest.TestCase):
         self.assertEqual(ref.evaluate(i, [[1]])["cost"], 4)
 
     def test_depot_initialization(self):
-        text = document(n=1, weights={(0, 1): 2}, services=[3, 0],
-                        windows=[[5, 20], [0, 9]])
-        with self.assertRaises(ValueError):
-            ref.evaluate(instance(text, problem="VRPTW"), [[1]])
+        for profile in ref.PROFILES:
+            for problem in ("CVRP", "VRPTW"):
+                with self.subTest(profile=profile, problem=problem):
+                    with self.assertRaisesRegex(ValueError, "depot service time must be zero"):
+                        instance(document(n=1, services=[3, 0]), profile, problem)
+            route = document(n=1, weights={(0, 1): 2}, windows=[[5, 20], [0, 7]])
+            self.assertEqual(ref.evaluate(instance(route, profile, "VRPTW"), [[1]])["cost"], 2)
+            too_early = document(n=1, weights={(0, 1): 2}, windows=[[5, 20], [0, 6]])
+            with self.assertRaisesRegex(ValueError, "time window violated"):
+                ref.evaluate(instance(too_early, profile, "VRPTW"), [[1]])
 
     def test_binary_vs_decimal_temporal_boundary(self):
         text = document(weights={(0, 1): 0.33, (1, 2): 0.56, (2, 3): 0.11}, due=1)

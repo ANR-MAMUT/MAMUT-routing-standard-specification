@@ -34,15 +34,13 @@ def generate():
     result = ref.evaluate(instance, [[1, 2]], objective)
     manifest = dict(specification="mamut-static/0.1-draft", family="SyntheticExample",
                     benchmark_revision="synthetic-v1", instance_name="two-customers",
-                    problem=problem, objective=objective, profile=profile,
+                    problem=problem, objective=objective, default_profile=profile,
                     units=dict(cost="fixture-unit", time="fixture-unit"),
                     cost_is_travel_time=True,
                     instance=dict(path=instance_path.name, sha256=sha(instance_path)),
                     sidecars=[],
-                    materialization=dict(recipe="embedded-matrix", interpretation="binary64",
+                    materialization=dict(kind="embedded-matrix", interpretation="binary64",
                                          matrix_sha256=ref.matrix_digest(instance["matrix"], "binary64")),
-                    generation=dict(recipe="synthetic literal fixture", script="src/make_example.py",
-                                    script_sha256=sha(ROOT / "src/make_example.py"), seed=None),
                     features=["single-depot", "homogeneous-capacity", "mandatory-visits", "service-start-windows"])
     manifest_path = write("example-manifest.json", manifest)
     standard = dict(specification="mamut-static/0.1-draft", benchmark_revision="synthetic-v1",
@@ -51,13 +49,9 @@ def generate():
                     routes_sha256=ref.routes_digest(result["routes"]),
                     evaluation=dict(checker="src/reference.py", source_sha256=sha(ROOT / "src/reference.py"),
                                     runtime=dict(python=sys.version, platform=platform.platform()),
-                                    verification_status="evaluated-by-reference"),
-                    display_overflow=ref.display_cost(result["cost"]) is None,
-                    assurance=dict(incumbent_verification="checked-by-reference",
-                                   source_reported_claim=None,
-                                   solver=dict(name=None, version=None, search_arithmetic=None, tolerances=None),
-                                   lower_bound=None, proof=None,
-                                   note="Synthetic specification fixture. No solver run or optimality claim."))
+                                    verification_status="incumbent-verified",
+                                    note="Synthetic specification fixture. No solver run or optimality claim."),
+                    display_overflow=ref.display_cost(result["cost"]) is None)
     write("example-result.json", dict(routes=result["routes"], cost=ref.display_cost(result["cost"]),
                                       metadata=dict(standard=standard)))
     return result

@@ -110,12 +110,18 @@ def load_instance(text, profile, problem):
     if any(matrix[i][i] != 0 for i in range(n + 1)):
         reject("nonzero diagonal")
     windows = services = None
+    if problem == "VRPTW" or d.get("service_times") is not None:
+        raw_services = d.get("service_times")
+        if not isinstance(raw_services, list) or len(raw_services) != n + 1:
+            reject("invalid services")
+        if quantity(raw_services[0], profile) != 0:
+            reject("depot service time must be zero")
     if problem == "VRPTW":
         windows = [[quantity(x, profile) for x in row] for row in d["time_windows"]]
-        services = [quantity(x, profile) for x in d["service_times"]]
         if len(windows) != n + 1 or any(len(w) != 2 for w in windows):
             reject("invalid windows")
-        if len(services) != n + 1 or any(x < 0 for x in services):
+        services = [quantity(x, profile) for x in raw_services]
+        if any(x < 0 for x in services):
             reject("invalid services")
         if any(e < 0 or e > l for e, l in windows):
             reject("invalid window bounds")
@@ -181,8 +187,7 @@ def evaluate(instance, routes, objective="MonoCost"):
     for route in ordered:
         route_cost = zero
         if instance["problem"] == "VRPTW":
-            e0, l0 = instance["windows"][0]
-            departure = add(e0, instance["services"][0], approximate)
+            departure = instance["windows"][0][0]
         for i, j in route_arcs(route):
             weight = instance["matrix"][i][j]
             if arithmetic == "grouped":

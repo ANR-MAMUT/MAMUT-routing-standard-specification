@@ -54,7 +54,8 @@ def validate():
 
     for profile in ref.PROFILES:
         check(profile in tex, "documented executable profile: " + profile)
-    check("\\lstinputlisting[language=Python]{src/reference.py}" in main, "reference embedded in PDF source")
+    check((ROOT / "src/reference.py").is_file() and "\\input{tex/td-core}" in main
+          and "\\lstinputlisting" not in main + tex, "TD core and separate static code companion")
 
     manifest_path = ROOT / "example-manifest.json"
     manifest = json.loads(manifest_path.read_text())
@@ -63,7 +64,9 @@ def validate():
     check(sha(manifest_path) == standard["manifest_sha256"], "example manifest identity")
     instance_path = ROOT / manifest["instance"]["path"]
     check(sha(instance_path) == manifest["instance"]["sha256"], "example instance identity")
-    check(sha(ROOT / "src/make_example.py") == manifest["generation"]["script_sha256"], "example generator identity")
+    check("generation" not in manifest, "generation history is separate from the instance manifest")
+    check(manifest["default_profile"] == standard["profile"], "example uses manifest default profile")
+    check(manifest["materialization"]["kind"] == "embedded-matrix", "example matrix representation")
     instance = ref.load_instance(instance_path.read_text(), standard["profile"], manifest["problem"])
     evaluated = ref.evaluate(instance, result["routes"], standard["objective"])
     check(evaluated["cost"] == ref.read_exact_record(standard["authoritative_cost"]), "example authoritative cost")
@@ -73,7 +76,9 @@ def validate():
     check(ref.routes_digest(evaluated["routes"]) == standard["routes_sha256"], "example route-stream identity")
     check(ref.matrix_digest(instance["matrix"], "binary64") == manifest["materialization"]["matrix_sha256"], "example matrix identity")
     check(standard["evaluation"]["source_sha256"] == sha(ROOT / "src/reference.py"), "example checker identity")
-    check(standard["assurance"]["proof"] is None, "synthetic example has no proof claim")
+    check("optimality" not in result["metadata"], "synthetic example has no optimality claim")
+    check(standard["evaluation"]["verification_status"] == "incumbent-verified",
+          "synthetic example records incumbent verification separately")
 
     log = (ROOT / "main.log").read_text()
     check("Output written on main.pdf" in log, "PDF build completed")
