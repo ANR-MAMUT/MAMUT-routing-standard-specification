@@ -2,7 +2,7 @@
 This section defines what a result records and what the ecosystem compares. A BKS is an accepted incumbent for one benchmark revision, objective and numerical profile. It is not an optimality certificate by itself. Each BKS retains a top-level \id{cost} field for existing clients and website display. The authoritative numerical value is stored in metadata together with its contract identity. Ranking \mustnot{} use the compatibility \id{cost} field or a 2-decimal website string.
 
 \subsection{Exact encoding and display}
-For an authoritative value $C\in\Q$, this draft selects a single canonical exact encoding: write $C=p/q$ with $p\in\mathbb{Z}$, $q\in\mathbb{Z}_{>0}$ and $\gcd(|p|,q)=1$, and store $p$ and $q$ in \id{numerator} and \id{denominator} strings. Each string contains a base-10 integer without leading plus or leading zeros. Zero has numerator string \id{"0"} and denominator string \id{"1"}. A nonzero negative numerator is allowed for general bound metadata. Feasible routing costs remain in $\Q_{\geq0}$. The reader \must{} reject noncanonical fractions, rather than silently assigning another exact byte identity to the same canonical value.
+For an authoritative value $C\in\Q$, write $C=p/q$ with $p\in\mathbb{Z}$, $q\in\mathbb{Z}_{>0}$ and $\gcd(|p|,q)=1$, and store $p$ and $q$ in \id{numerator} and \id{denominator} strings. Each string contains a base-10 integer without leading plus or leading zeros. Zero has numerator string \id{"0"} and denominator string \id{"1"}. A nonzero negative numerator is allowed for general bound metadata. Feasible routing costs remain in $\Q_{\geq0}$. The reader \must{} reject noncanonical fractions, rather than silently assigning another exact byte identity to the same canonical value.
 
 Numerator/denominator storage works for dyadic, decimal-grid and arbitrary rational results. Exact terminating decimal strings and scaled integers are possible derived views, but this version does not store multiple competing authoritative encodings. Strings avoid forcing arbitrary-size integers through clients that interpret every JSON number as binary64. Conversion to a finite-precision Decimal context is not required to read or compare the authoritative value \autocite{brayJSON2017,pythonFractions2026}.
 
@@ -11,15 +11,15 @@ For an exact profile with $C\in\Q_{\geq0}$, compute $\widehat C=\RoundBinary(C)\
 A website that shows $d\in\mathbb{N}_0$ decimal places \must{} derive its display from $Q_d(C)\in\Grid{d}$ with nearest-even ties, rather than decimal-rounding the already rounded \id{cost}. This avoids \href{https://en.wikipedia.org/wiki/Rounding#Double_rounding}{double rounding} changing the displayed decimal. The reference \id{display_decimal} implements the rule. Imported historical table values remain separate source claims, with their original precision and rounding convention recorded when known. This website rule does not assert SINTEF's undocumented tie-breaking behavior.
 
 \subsection{Required provenance envelope}
-The proposed envelope lives at \id{metadata.standard}. Its field names are a draft integration proposal and are not asserted to be accepted by current library schemas. A conforming new result \must{} include the following fields, in addition to its routes and compatibility \id{cost}:
+The proposed envelope lives at \id{metadata.standard}. The field names are provisional. A conforming new result \must{} include the following fields, in addition to its routes and compatibility \id{cost}:
 
 \begin{longtable}{@{}p{4.2cm}p{11.4cm}@{}}
 \toprule
 Field & Meaning and required value\\
 \midrule
 \endhead
-\id{specification} & Immutable specification revision. The earlier static fixture uses \id{mamut-static/0.1-draft}.\\
-\id{benchmark_revision} & Immutable family revision identifier selected by its manifest. A library version alone is insufficient.\\
+\id{specification} & Immutable specification revision. The synthetic static example uses \id{mamut-static/0.1-draft}.\\
+\id{benchmark_revision} & Identifies the family repository and its immutable revision, e.g., a commit identified directly or by a release tag pinned to that commit.\\
 \id{manifest_sha256} & SHA-256 of the complete UTF-8 manifest bytes. The manifest does not contain its own hash.\\
 \id{profile} & Full selected integrated profile identifier. Unknown identifiers are unsupported, without fallback.\\
 \id{objective} & One of \id{MonoCost}, \id{HierarchicalVehicleCost} (static), \id{Duration} or \id{FleetCostDuration} (TD).\\
@@ -96,6 +96,6 @@ Then $L=\sum_{i\in\mathcal{C}}\pi_i-\kappa\eta$ is a valid lower bound for that 
 
 If every fixed-fleet objective belongs to a known lattice of spacing $\delta\in\Q_{>0}$, a rigorous $L>U-\delta$ proves optimality: any better feasible value would be at most $U-\delta$. A conventional tolerance such as $10^{-6}$ does not automatically close a much finer binary lattice. For a hierarchical objective, a proof must also establish the minimal vehicle-count tier before closing the distance gap at that tier. A certified positive gap is a valid outcome when strict closure is unavailable.
 
-The evaluation and optimality records \must{} distinguish incumbent verification, source-reported claim, and any verified bound or proof. Absent proof evidence \mustnot{} be represented as certified optimality. Search, checking, certification and end-to-end runtimes \should{} be recorded separately with timer scopes. Reporting these scopes is essential when comparing methods that provide different assurance. Implementing a proof-producing BPC engine or running a safe-pricing pilot is a separate research task, not a prerequisite for adopting this static evaluation standard.
+The evaluation and optimality records \must{} distinguish incumbent verification, source-reported claim, and any verified bound or proof. Absent proof evidence \mustnot{} be represented as certified optimality. Search, checking, certification and end-to-end runtimes \should{} be recorded separately with timer scopes. Reporting these scopes is essential when comparing methods that provide different assurance.
 
 An archived proof for a rounded-cost or other interpretation remains attached to that model. Reevaluating its incumbent under the new exact profile can establish a new feasible upper bound, but does not transfer its lower bound or optimality claim. Publication provenance and the original claim remain preserved without silently upgrading their numerical assurance.

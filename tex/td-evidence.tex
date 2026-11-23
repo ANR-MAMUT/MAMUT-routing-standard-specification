@@ -1,10 +1,10 @@
 \section{Time-dependent evaluation across checker versions}\label{app:td-evidence}
 
-For a fixed route, all 3 evaluators start from the same materialized arc knots and seek a minimum duration over depot departures. The September 2026 releases prescribe sequences of binary64 operations. The proposed \id{td-binary64-exact-v1} profile specifies the exact minimum on the stored operands and the earliest departure attaining it (Section~\ref{sec:td-core}).
+For a fixed route, all 3 evaluators start from the same materialized arc knots and seek a minimum duration over depot departures. The September 2026 releases prescribe sequences of binary64 operations. The \id{td-binary64-exact-v1} profile specifies the exact minimum on the stored operands and the earliest departure attaining it (Section~\ref{sec:td-core}).
 
 In v0.11.0, \id{td-fold/1} begins with the identity on the departure interval and composes the arc and customer functions in order. Waiting, service and the final depot deadline all use the generic composition routine. In v0.12.0, \id{td-fold/2} restricts the first arc, applies waiting and service directly and cuts the domain at the depot deadline. Its unit-slope shortcut tests equality of the rounded rise and run of an affine segment. Those differences can agree even when the exact slope differs from 1.
 
-Both releases sum route durations in binary64, in order of first customer, and add any fleet charge. The proposed profile computes that entire objective exactly. The October \href{https://github.com/0nyr/routing-numerical-contracts/blob/75905c8827f959621ea808894e28136d248d2d15/report/main.pdf}{numerical checker study} recommended restoring the first fold for continuity. This draft adopts exact evaluation for new revisions. Historical results and proofs keep their original fold.
+Both releases add the route durations in binary64, in order of first customer, and include any fixed vehicle charge. Under \id{td-binary64-exact-v1}, the checker minimizes each route duration on the materialized knots and sums the resulting durations and vehicle charges exactly. Rounding an intermediate time can move it across a jump in the next arc function, as the Rifki-30 route illustrates below.
 
 \subsection{A branch change on the Rifki-30 route}
 
@@ -46,7 +46,7 @@ On Dabia2013, v0.12 matches 39 more route durations, yet both releases match the
 
 \subsection{Time to evaluate one route}
 
-We use the archived serial measurements on an Intel i7-12700H with CPython 3.13.13. Within each panel a fixed hash ordering selected 12 routes with at most 25 customers. Table~\ref{tab:td-matched-runtime} compares all 3 implementations on those same routes. Both released folds start with the arc functions in memory. For the proposed profile we time the study's independent reference. It constructs the rational functions for the route, partitions the departure interval at preimages of their boundaries and minimizes duration over that partition.
+We use the archived serial measurements on an Intel i7-12700H with CPython 3.13.13. Within each panel a fixed hash ordering selected 12 routes with at most 25 customers. Table~\ref{tab:td-matched-runtime} compares all 3 implementations on those same routes. Both released folds start with the arc functions in memory. For the exact profile we time the study's independent reference. It constructs the rational functions for the route, partitions the departure interval at preimages of their boundaries and minimizes duration over that partition.
 
 \begin{table}[htbp]
 \centering
