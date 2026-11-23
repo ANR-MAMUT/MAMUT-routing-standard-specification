@@ -1,0 +1,26 @@
+\subsection{How the static ranking rule changes an incumbent comparison}\label{app:static-history}
+
+In v0.11.0 the static checker added successive arc costs in binary64, in submitted route order, and its reported cost supplied the usual BKS comparison. Version 0.12.0 kept this checker arithmetic, stored routes in canonical order, and ranked candidates by a separate exact sum. Each term in that sum was the decimal value of the shortest round-trip spelling of the loaded arc cost. Under the proposed v0.13 rule, the checker and the BKS comparison use the same exact sum of the materialized binary64 arc values (Section~\ref{sec:profiles}).
+
+We reprice 317 pairs of distinct route lists on identical instance bytes. The archive contains 2,273 candidates on 1,956 of the 1,976 enumerated static instances. The third Mamut2026 campaign was unavailable. We compare costs in each instance's units, with fleet size first for hierarchical objectives. The 15 Dimacs2021 pairs use integral arc costs, for which exact integer and exact binary sums agree. The corpus checks below address feasibility separately. The \href{https://github.com/0nyr/routing-numerical-contracts/tree/75905c8827f959621ea808894e28136d248d2d15}{frozen numerical study} provides the arc operands and both released checker implementations.
+
+All 3 rules rank the later candidate strictly better on 286 pairs. The remaining 31 pairs come from the Mamut2026 campaign that restored earlier route sets to the store. Table~\ref{tab:static-history} shows why the exact meaning of an arc value matters even when both sums use rational arithmetic.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Comparison rule & Better & Tied & Worse\\
+\midrule
+v0.11.0, submitted-order binary64 sum & 0 & 0 & 31\\
+v0.12.0, exact sum of decimal spellings & 0 & 31 & 0\\
+Proposed v0.13, exact sum of binary64 values & 3 & 22 & 6\\
+\bottomrule
+\end{tabular}
+\caption{Ranking of the restored route set against its immediate predecessor on the 31 Mamut2026 pairs. Each column counts pairs. An exact tie retains whichever route set is already stored.}\label{tab:static-history}
+\end{table}
+
+For example, on the Manila fastest-time instance \id{mamut-manila-n221-k48-hyb}, the restored route set costs exactly $5/2^{47}$ seconds less than its predecessor under the proposed rule. Both exact totals round to the same binary64 display, $47689.131$ seconds. The v0.11.0 sum orders the pair in the opposite direction, and v0.12.0 ties them.
+
+The \href{https://github.com/0nyr/routing-numerical-contracts/blob/75905c8827f959621ea808894e28136d248d2d15/results/controlled-static.json}{controlled static measurements} compare the time to form one candidate's cost on 25 records across 5 families. Starting from the same gathered arc costs, the median was $7.35\,\mu$s for the submitted-order binary64 sum, $543.72\,\mu$s for the exact sum of decimal spellings, and $307.58\,\mu$s for the exact sum of binary64 values. The latter two Python implementations convert the operands inside the timed call. Each record contributes the median of 7 calibrated batches. Tables~\ref{tab:runtime-loaded} and~\ref{tab:runtime-prepared} show how preparation and integer arithmetic affect the cost of the same exact-binary rule on the larger SINTEF panel.

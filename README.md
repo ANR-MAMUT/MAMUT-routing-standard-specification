@@ -22,7 +22,9 @@ This repository is initially private for review. Public release, integration as 
 - [tex/static-rounded.tex](tex/static-rounded.tex) gives the operational static alternatives in an appendix.
 - [tex/results.tex](tex/results.tex): authoritative metadata, BKS ranking, display, solver and proof claims.
 - [tex/adoption.tex](tex/adoption.tex): conformance, migration and open decisions.
-- [tex/evidence.tex](tex/evidence.tex): appendix containing corpus checks and the full objective-runtime census at n=100, 400, 600, 800 and 1000 (296 instances).
+- [Appendix B](tex/evidence.tex) compares historical static rankings in [317 candidate pairs](tex/static-history.tex), checks the SINTEF matrices and gives the objective-runtime census on 296 instances.
+- [Appendix D](tex/td-evidence.tex) compares the released TD folds with the proposed exact profile using the Rifki-30 jump and archived routes. The [native scheduling study](tex/td-native.tex) compares exact prefix composition and a departure sweep. The [Kayros pilot](tex/td-kayros.tex) reports full-instance timings and checks the actual Kayros root multipliers against every feasible route on Rifki-1 and Rifki-13.
+- To reproduce the new static comparison, run `python src/check_static_history.py /path/to/data/static-history.json.gz` on the [pinned study archive](https://github.com/0nyr/routing-numerical-contracts/tree/75905c8827f959621ea808894e28136d248d2d15). After restoring its input and result bundles as described in the study README, run `python src/summarize_td_panels.py /path/to/routing-numerical-contracts` to reproduce both TD tables. The [figure generator](src/plot_rifki_jump.py) takes the same archive's `fixtures/rifki30-route.json` and uses Matplotlib.
 - [tex/runtime-tables.tex](tex/runtime-tables.tex): generated per-size timing and preparation tables for all 9 measured implementations.
 - [figures/objective-runtime-by-size.pdf](figures/objective-runtime-by-size.pdf): standalone runtime plot for both measurement scopes.
 - [tex/native-evidence.tex](tex/native-evidence.tex) and [tex/native-tables.tex](tex/native-tables.tex): native C++/pybind11 range/conformance evidence, complete solution checking and Python integration measurements.
@@ -33,7 +35,7 @@ This repository is initially private for review. Public release, integration as 
 - [src/test_reference.py](src/test_reference.py): 24 boundary and conformance tests.
 - [src/make_example.py](src/make_example.py): creates the synthetic instance, manifest and result with actual hashes.
 - [src/validate_draft.py](src/validate_draft.py): checks the compiled document, recorded sources and synthetic result.
-- [src/validate_evidence.py](src/validate_evidence.py): focused s124 census-export, appendix and current-PDF verification, preserving historical provenance records.
+- [src/validate_evidence.py](src/validate_evidence.py) verifies the census exports, appendix and PDF against the frozen October s124 snapshot.
 - [evidence-provenance.json](evidence-provenance.json) and [evidence-validation.json](evidence-validation.json): s124 experiment identities, export hashes and report-integration checks.
 - [provenance.json](provenance.json): source paths, revisions, decision inputs and source-file hashes.
 - [validation.json](validation.json): document and companion checks recorded for the earlier s121 snapshot.

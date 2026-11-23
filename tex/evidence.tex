@@ -1,5 +1,7 @@
-\section{Evidence supporting the design}\label{sec:evidence}
-This appendix presents the corpus checks and objective-evaluation measurements supporting the design, together with their limits. We evaluate fixed candidate routes and finite matrix constructions, without new solver searches or optimality proofs.
+\section{Static evaluation across checker versions}\label{sec:evidence}
+We first compare the ranking of historical incumbents under v0.11, v0.12 and the proposed v0.13 default. We then examine the SINTEF matrices and routes, and measure the cost of computing an exact objective from those matrices.
+
+\input{tex/static-history}
 
 \subsection{Corpus and matrix checks}
 % Internal experiment record: /home/onyr/code/phd/numerical-checker-contracts-investigation/results/s120-sintef/protocol.json, protocol-addendum.json, sources.json, summary.json, supplementary-results.json and reproducibility.json. Frozen experiment revision: 982044f967f3a689dcd10847894bef326b8d14b8. Source corpus revision: eca336ff4b087f5c2f7b9ac7c2ab33668ff7af2b.

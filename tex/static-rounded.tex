@@ -1,5 +1,5 @@
 \section{Prescribed binary64 alternatives for static evaluation}\label{sec:rounded}
-This section gives complete operation sequences for the rounded profiles. First parse every arc and temporal quantity as finite binary64, normalize zero, and apply the same structural checks. Initialize each objective accumulator to positive binary64 zero. In all additions below, round to nearest binary64 with ties to even immediately after that addition. Reject an arithmetic overflow rather than returning an infinite objective.
+For each rounded profile, parse every arc and temporal quantity as finite binary64, normalize zero and apply the shared structural checks. Initialize each objective accumulator to positive binary64 zero. Round each addition immediately to nearest binary64 with ties to even. Reject overflow.
 
 \begin{algorithm}[htbp]
 \caption{Binary64 objective modes after route validation}\label{alg:rounded-objective}
@@ -23,4 +23,4 @@ For rounded temporal feasibility, use the same service-start notation, with $t_0
 
 The grouped mode \must{} use explicit binary64 additions both inside and across routes. An implementation \mustnot{} replace them with a version-dependent language \id{sum}, parallel reduction, \id{fsum}, extended accumulator or reassociated expression. For submitted order, the original enumeration $\mathbf{s}$ is part of the evaluated solution identity and \must{} be retained alongside the mathematical route set $\mathcal{S}$. Its authoritative value can depend on both $\mathcal{S}$ and $\mathbf{s}$. Canonicalizing that file and then evaluating it as submitted order can change its authoritative value.
 
-The result fraction for a rounded profile records the exact value of its final rounded binary64 number. That encoding does not turn its internal temporal or objective operations into an exact-arithmetic profile. A result \must{} retain the profile identifier so readers can distinguish these meanings.
+The result fraction records the exact value of the final binary64 accumulator. Each result \must{} retain its profile identifier to identify the arithmetic used for timing and cost.

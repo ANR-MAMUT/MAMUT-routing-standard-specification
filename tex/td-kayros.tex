@@ -1,0 +1,35 @@
+\subsection{From a checked route to an optimality proof in Kayros}\label{app:td-kayros}
+
+Checking a submitted solution supplies an exact upper bound. To measure the additional work needed for a lower bound, we took 2 complete 10-customer Rifki2020 instances, ran the Kayros 1.8 repair checkout using its historical \id{td-fold/1} objective, and solved the same instances independently under \id{td-binary64-exact-v1}. We used every directed arc and every capacity-admissible customer order. Rifki-1 was the first numbered instance. We selected Rifki-13 because a previous pricing audit had identified a discrepancy on one of its routes.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+ & Rifki-1 & Rifki-13\\
+\midrule
+Capacity-admissible route orders & 7,396 & 37,180\\
+Temporally feasible route orders & 4,527 & 37,180\\
+Exact optimal solution duration & 3,594 & 4,128\\
+\midrule
+Kayros branch-and-price, historical fold (s) & 0.384 & 6.257\\
+Enumeration with integral breakpoints (s) & 0.479 & 5.919\\
+Enumeration with general GMP composition (s) & 5.769 & 70.680\\
+\bottomrule
+\end{tabular}
+\caption{Whole-instance wall times, including input loading, on the same Grid'5000 CPU as Table~\ref{tab:td-native-route}. The first 2 time rows give medians of 3 fresh processes. The last gives 1 run per instance. The enumeration times include the subset dynamic program that selects the best collection of routes.}\label{tab:td-kayros-pilot}
+\end{table}
+
+On these 2 instances, all knot coordinates, service times and window bounds are integers and all affine arc slopes are 0 or 1. Each affine prefix therefore has slope 0 or 1 and integer intercept. An increasing prefix reaches an integer threshold at an integer departure. By induction all cuts of the feasible route profile are integral, including an earliest minimizer. This justifies testing integer departures on these instances under the continuous-time rule. The specialized implementation shares prefix computations and evaluates the eligible integer times in batches. General GMP composition instead solves each admissible ordered route independently over continuous time. The two methods agree on feasibility for all 44,576 orders and on the exact duration and earliest departure of every feasible order.
+
+Kayros returned routes attaining the exact optimum on both instances. Its fold gave a total of \id{4127.999999999996} on Rifki-13. A different route, $\langle4,9,5,8,6\rangle$, exposes a larger discrepancy. Its historical minimum was 2372 at departure 2146, and the exact minimum is 2370 at 1440. An exact check of the returned solution alone would not reveal that change to a competing column.
+
+We also obtained a lower bound from the set-partitioning relaxation over the complete route list. On Rifki-1, exact verification of a primal and a dual solution gives 3594 at the root. On Rifki-13 the root relaxation gives $16167/4=4041.75$. Adding the 120 three-customer subset-row inequalities raises the verified bound to 4128. For each triple, at most one route in an exact cover can visit two or more of its customers. In both certificates we checked exact primal feasibility, dual signs, equality of objectives and nonnegative reduced cost on every feasible route. These certificates were obtained independently of the Kayros pricing engine.
+
+\paragraph{Do the multipliers used by Kayros certify its root?}
+We recorded the final LP multipliers, active cuts and forbidden arcs in a separate run of the same solver on each instance. Both searches ended at the unrestricted root. At Rifki-1 the stored multipliers already give a lower bound of 3594. The minimum exact reduced cost across all 4,527 feasible routes is zero.
+
+At Rifki-13, Kayros used 12 subset-row cuts. With its binary64 multipliers read exactly, 3 of the 37,180 feasible routes have negative reduced cost. Route $\langle 1,7\rangle$ attains the smallest value, $-2^{-43}$. The multipliers are all close to integers. We used their nearest integers as a candidate dual, verified the signs of the cut multipliers and checked every route inequality against the exact route duration. The minimum reduced cost is then zero and the verified dual objective is exactly 4128. Since the submitted routes attain 4128, this proves optimality directly. Rounding serves only to propose a dual witness. Its validity follows from checking all inequalities, a test that can also reject the proposed witness.
+
+Starting from the saved complete route catalog, solver result and trace, the independent verifier took 0.118~s on Rifki-1 and 0.676~s on Rifki-13 (medians of 3 fresh processes). These times include reading the files and checking the duals. Constructing the catalogs takes the separate enumeration times in Table~\ref{tab:td-kayros-pilot}, which also include selecting an optimum. A production Kayros integration must establish a lower bound over every permitted route at a closing node, including routes discarded during pricing. Both pilot instances close at the root. A branching instance with nonintegral route costs would test pricing, dominance and node pruning under the proposed profile.
