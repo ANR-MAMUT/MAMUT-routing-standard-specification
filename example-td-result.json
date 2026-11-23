@@ -11,8 +11,8 @@
   "metadata": {
     "standard": {
       "specification": "mamut-routing/0.1-review",
-      "benchmark_revision": "synthetic-td-v1",
-      "manifest_sha256": "4a86cf38369c03ac81038bbd1afd7b848f646a6fb9ccb133a93fde53b75eb10d",
+      "benchmark_revision": "r1",
+      "manifest_sha256": "683880483f63728188fd4091eec8d7a0060196edb40c9f099045b155979efc28",
       "profile": "td-binary64-exact-v1",
       "objective": "FleetCostDuration",
       "num_routes": 2,

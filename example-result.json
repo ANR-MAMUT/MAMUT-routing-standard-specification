@@ -9,8 +9,8 @@
   "metadata": {
     "standard": {
       "specification": "mamut-routing/0.1-review",
-      "benchmark_revision": "synthetic-v1",
-      "manifest_sha256": "0e738ebfcbd7e3098340cadaba99f0e22943e46157774f5e66a90693c077d599",
+      "benchmark_revision": "r1",
+      "manifest_sha256": "cb6b60ba2f267b225751d391f78902a72765b3913a31a3db18beb748094ed5cf",
       "profile": "binary64-exact-v1",
       "objective": "MonoCost",
       "num_routes": 1,

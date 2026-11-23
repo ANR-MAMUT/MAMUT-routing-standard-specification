@@ -8,8 +8,8 @@ The [introduction](tex/foundations.tex) distinguishes conformance, mathematical 
 
 The [shared route calculation](tex/evaluation.tex) follows a vehicle from depot departure to depot return. The [TD scheduling rules](tex/td-core.tex) show how to minimize elapsed time and choose the earliest departure when several departures attain the same minimum. The [result section](tex/results.tex) uses two worked examples to explain what a checker stores and what a website displays.
 
-- The [static instance](example-instance.json), [manifest](example-manifest.json) and [result](example-result.json) show the exact sum of three binary64 arc costs that displays as `0.6`.
-- The [TD instance](example-td-instance.json), [arc functions](example-td.atf.json), [manifest](example-td-manifest.json) and [result](example-td-result.json) show how to read the exact duration and earliest departure of each stored route. The exact solution total, including two vehicle charges, is `79/6`.
+- The [static instance](example-instance.json), [manifest](example-instance.manifest.json) and [result](example-result.json) show the exact sum of three binary64 arc costs that displays as `0.6`.
+- The [TD instance](example-td-instance.json), [arc functions](example-td.atf.json), [manifest](example-td-instance.manifest.json) and [result](example-td-result.json) show how to read the exact duration and earliest departure of each stored route. The exact solution total, including two vehicle charges, is `79/6`.
 
 After the bibliography, the appendices provide [mathematical notation](tex/notation.tex), [canonical digest encodings](tex/materialization-format.tex) with [byte-level examples](materialization-vectors.json), the [Python and native implementation guide](tex/implementation-guide.tex), [alternative input readings and arithmetic modes](tex/alternative-readings.tex), the [existence proof for TD route minima](tex/td-attainment.tex), and [historical solver claims and migration](tex/solver-claim.tex).
 

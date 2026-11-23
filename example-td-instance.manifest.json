@@ -1,7 +1,7 @@
 {
   "specification": "mamut-routing/0.1-review",
   "family": "SyntheticExample",
-  "benchmark_revision": "synthetic-td-v1",
+  "benchmark_revision": "r1",
   "instance_name": "two-singleton-routes",
   "problem": "TDVRPTW",
   "objective": "FleetCostDuration",
