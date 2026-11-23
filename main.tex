@@ -5,40 +5,98 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern,microtype}
 \usepackage[a4paper,margin=2cm]{geometry}
+\usepackage[onehalfspacing]{setspace}
 \usepackage{mathtools,amssymb}
-\usepackage{booktabs,tabularx}
-\usepackage{csquotes,xurl}
+\usepackage{booktabs,longtable,tabularx,array}
+\usepackage{graphicx}
+\usepackage{algorithm,algpseudocode,csquotes,xurl}
+\usepackage[section]{placeins}
 \usepackage[backend=biber,style=alphabetic,sorting=none,maxbibnames=7,minbibnames=7,maxcitenames=2]{biblatex}
 \addbibresource{biblio.bib}
 \setcounter{biburlnumpenalty}{100}
 \setcounter{biburllcpenalty}{200}
 \setcounter{biburlucpenalty}{200}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
-\setlength{\parskip}{0.55em}
-\setlength{\parindent}{0pt}
+\usepackage{etoolbox}
+\makeatletter
+% Use the existing report workaround for finite longtable footer shrinkage.
+\patchcmd{\LT@output}{\vss}{\vskip\z@ \@plus 1fil \@minus \textheight}{}{}
+\patchcmd{\LT@output}{\vss}{\vskip\z@ \@plus 1fil \@minus \textheight}{}{}
+\makeatother
+\setlength{\parskip}{1em}
+\setlength{\parindent}{1em}
 \setlength{\emergencystretch}{2em}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Fbin}{\mathbb{F}_{64}}
+\newcommand{\FbinNonneg}{\mathbb{F}_{64,\geq0}}
+\newcommand{\FbinExt}{\overline{\mathbb{F}}_{64}}
+\newcommand{\Dyadic}{\mathbb{D}}
+\newcommand{\DecimalSet}{\mathbb{D}_{10}}
+\newcommand{\Grid}[1]{\mathbb{G}_{#1}}
+\newcommand{\JsonNum}{\mathcal{T}_{\mathrm{JSON}}}
+\newcommand{\Dec}{\operatorname{dec}}
+\newcommand{\RatBin}{\iota_{64}}
+\newcommand{\RoundBinary}{\operatorname{RN}_{64}}
+\newcommand{\fl}{\operatorname{fl}_{64}}
 \newcommand{\id}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\must}{\textsc{must}}
+\newcommand{\mustnot}{\textsc{must not}}
+\newcommand{\may}{\textsc{may}}
+\newcommand{\should}{\textsc{should}}
 
 \title{MAMUT-routing Standard Specification\\[0.7ex]\large Numerical semantics for static and time-dependent routing benchmarks}
-\author{\normalsize \href{https://orcid.org/0009-0005-8630-3962}{Adrien Pichon}\textsuperscript{1}\thanks{First authors, listed alphabetically by last name.}\quad \href{https://orcid.org/0009-0005-3253-9814}{Florian Rascoussier}\textsuperscript{2,3}\footnotemark[1]\\
-\normalsize \href{https://orcid.org/0000-0002-2614-3822}{Romain Billot}\textsuperscript{2}\thanks{Second authors, listed alphabetically by last name.}\quad \href{https://orcid.org/0000-0002-7207-0580}{Lina Fahed}\textsuperscript{2}\footnotemark[2]\quad \href{https://orcid.org/0000-0002-0715-2168}{Alexandru-Liviu Olteanu}\textsuperscript{1}\footnotemark[2]\\
-\normalsize \href{https://orcid.org/0000-0003-3855-9072}{Marc Sevaux}\textsuperscript{1}\footnotemark[2]\quad \href{https://orcid.org/0000-0002-0919-496X}{Christine Solnon}\textsuperscript{3}\footnotemark[2]\\[0.7ex]
+\author{\normalsize Adrien Pichon\textsuperscript{1}\thanks{First authors, listed alphabetically by last name.}\quad Florian Rascoussier\textsuperscript{2,3}\footnotemark[1]\\
+\normalsize Romain Billot\textsuperscript{2}\thanks{Second authors, listed alphabetically by last name.}\quad Lina Fahed\textsuperscript{2}\footnotemark[2]\quad Alexandru-Liviu Olteanu\textsuperscript{1}\footnotemark[2]\\
+\normalsize Marc Sevaux\textsuperscript{1}\footnotemark[2]\quad Christine Solnon\textsuperscript{3}\footnotemark[2]\\[0.7ex]
 \small \textsuperscript{1}Université Bretagne Sud, Lab-STICC, France\\
 \small \textsuperscript{2}IMT Atlantique, Lab-STICC, France\\
 \small \textsuperscript{3}INSA Lyon, Inria, CITI, France}
 \date{Draft Version 0.1.\the\year\ifnum\month<10 0\fi\the\month\ifnum\day<10 0\fi\the\day}
 \hypersetup{pdftitle={MAMUT-routing Standard Specification for Static and Time-Dependent Routing},pdfauthor={Adrien Pichon, Florian Rascoussier, Romain Billot, Lina Fahed, Alexandru-Liviu Olteanu, Marc Sevaux, Christine Solnon}}
 \begin{document}
+\begin{singlespace}
 \maketitle
+\begin{abstract}
+We specify how a MAMUT-routing benchmark revision assigns numerical meaning to an instance, a route and its reported cost. Materialization fixes the finite binary64 operands, and exact evaluation determines what those operands mean for a route. Static benchmarks use a cost matrix. Time-dependent benchmarks use arrival-time functions and optimize the departure of each route. Both settings compare incumbents using the exact objective and derive display values from it. We give the shared contracts, the evaluation rules specific to each setting and worked examples of their consequences.
+\end{abstract}
+
+\begin{center}
+\small
+\begin{tabular}{ll}
+\toprule
+Author & ORCID identifier\\
+\midrule
+Adrien Pichon & \href{https://orcid.org/0009-0005-8630-3962}{0009-0005-8630-3962}\\
+Florian Rascoussier & \href{https://orcid.org/0009-0005-3253-9814}{0009-0005-3253-9814}\\
+Romain Billot & \href{https://orcid.org/0000-0002-2614-3822}{0000-0002-2614-3822}\\
+Lina Fahed & \href{https://orcid.org/0000-0002-7207-0580}{0000-0002-7207-0580}\\
+Alexandru-Liviu Olteanu & \href{https://orcid.org/0000-0002-0715-2168}{0000-0002-0715-2168}\\
+Marc Sevaux & \href{https://orcid.org/0000-0003-3855-9072}{0000-0003-3855-9072}\\
+Christine Solnon & \href{https://orcid.org/0000-0002-0919-496X}{0000-0002-0919-496X}\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{singlespace}
+
+\clearpage
+\tableofcontents
+\clearpage
 \input{tex/foundations}
 \input{tex/contracts}
 \input{tex/evaluation}
+\input{tex/td-core}
 \input{tex/results}
-
+\input{tex/adoption}
+\printbibliography[heading=bibintoc]
+\clearpage
 \appendix
-\input{tex/materialization-format}
-\input{tex/alternative-readings}
-\input{tex/solver-claim}
+\input{tex/notation}
+\clearpage
+\input{tex/evidence}
+\FloatBarrier
+\input{tex/static-rounded}
+\FloatBarrier
+\input{tex/td-evidence}
+\clearpage
 \input{tex/td-attainment}
-\printbibliography
 \end{document}

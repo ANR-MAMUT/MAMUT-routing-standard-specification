@@ -1,5 +1,5 @@
 {
-  "specification": "mamut-routing/0.1-review",
+  "specification": "mamut-static/0.1-draft",
   "family": "SyntheticExample",
   "benchmark_revision": "synthetic-v1",
   "instance_name": "two-customers",
