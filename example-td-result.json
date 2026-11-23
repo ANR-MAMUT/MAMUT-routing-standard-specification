@@ -1,0 +1,60 @@
+{
+  "routes": [
+    [
+      1
+    ],
+    [
+      2
+    ]
+  ],
+  "cost": 13.166666666666666,
+  "metadata": {
+    "standard": {
+      "specification": "mamut-routing/0.1-review",
+      "benchmark_revision": "synthetic-td-v1",
+      "manifest_sha256": "4a86cf38369c03ac81038bbd1afd7b848f646a6fb9ccb133a93fde53b75eb10d",
+      "profile": "td-binary64-exact-v1",
+      "objective": "FleetCostDuration",
+      "num_routes": 2,
+      "authoritative_cost": {
+        "numerator": "79",
+        "denominator": "6"
+      },
+      "routes_sha256": "9a183e0e971a39c2e465d2666c3adfce5e73dfb18297c3a0bfb6c6c8d238011f",
+      "evaluation": {
+        "checker": "src/td_example.py",
+        "backend": "python-fraction-affine-singleton",
+        "source_sha256": "7dc4f8064cf148536fdd1f31957c370c07157c3e85227950287aa45d6a251e92",
+        "runtime": {
+          "python": "3.13.13 (main, Apr  7 2026, 18:19:01) [GCC 15.2.0]",
+          "platform": "Linux-6.18.63-x86_64-with-glibc2.42"
+        },
+        "verification_status": "incumbent-verified",
+        "note": "Synthetic specification fixture."
+      },
+      "display_overflow": false,
+      "route_evaluations": [
+        {
+          "duration": {
+            "numerator": "14",
+            "denominator": "3"
+          },
+          "departure_time": {
+            "numerator": "10",
+            "denominator": "3"
+          }
+        },
+        {
+          "duration": {
+            "numerator": "6",
+            "denominator": "1"
+          },
+          "departure_time": {
+            "numerator": "5",
+            "denominator": "1"
+          }
+        }
+      ]
+    }
+  }
+}

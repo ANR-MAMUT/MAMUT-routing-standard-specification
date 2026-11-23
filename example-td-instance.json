@@ -1,0 +1,41 @@
+{
+  "instance_name": "two-singleton-routes",
+  "num_customers": 2,
+  "depot": 0,
+  "num_vehicles": 2,
+  "vehicle_capacity": 1,
+  "demands": [
+    0,
+    1,
+    1
+  ],
+  "horizon": [
+    0,
+    15
+  ],
+  "time_windows": [
+    [
+      0,
+      15
+    ],
+    [
+      6,
+      7
+    ],
+    [
+      7,
+      9
+    ]
+  ],
+  "service_times": [
+    0,
+    1,
+    2
+  ],
+  "fleet_fixed_cost": 1.25,
+  "td": {
+    "model": "atf-ndcpwlf",
+    "atf_path": "example-td.atf.json",
+    "atf_sha256": "a2ad72e1478160b3a1965c06e78868f1807d2f3dd483073b435cab26e3937129"
+  }
+}
