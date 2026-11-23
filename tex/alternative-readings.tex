@@ -1,0 +1,31 @@
+\section{Alternative input readings and arithmetic modes}\label{app:alternatives}
+Three choices can be varied independently. A reader can assign another numerical meaning to a published token, an evaluator can round an intermediate result, or an implementation can compute the same exact operation in another representation. Only the first two can change a feasible schedule or an objective. The following identifiers let a reader interpret a result with an explicitly declared alternative profile. The default static and TD rules in the body apply to the binary64 operands.
+
+\subsection{Integral and decimal readings}
+The static profile \id{integer-exact-v1} requires integral binary64 arc and temporal operands throughout the instance. For eligible DIMACS and ORTEC instances, exact integer evaluation gives the same costs and feasibility decisions as \id{binary64-exact-v1}. A common dyadic scale inside a fast binary64 checker is an implementation choice and also accommodates fractional binary64 values.
+
+The \id{decimal-exact-v1} profile reads the original decimal token into an exact rational before any binary64 conversion. The \id{decimal-grid-3-v1} profile additionally requires every such arc and temporal operand to be a multiple of $10^{-3}$. For example, multiplying the exact decimal value of \id{215.359} by 1000 gives 215359. A matrix generator may use a 3-decimal quantization and still publish a benchmark whose default profile reads the emitted token as binary64. The declared reading determines which value the checker must compare to an exact deadline.
+
+For $x\in\Q$ and decimal precision $d\in\mathbb{N}_0$, define
+\begin{equation}\label{eq:decimal-quantization}
+Q_d(x)=10^{-d}\operatorname{roundEven}(10^d x)\in\Grid{d},\qquad \Grid{d}=10^{-d}\mathbb{Z}.
+\end{equation}
+At an exact half-integer, $\operatorname{roundEven}$ selects the even integer. Floor quantization is $10^{-d}\lfloor10^d x\rfloor$. Toward-zero quantization instead discards the fractional part of $10^d x$. Floor and toward zero agree for the nonnegative arc quantities here, but are distinct operations in general. Generation code and its documentation \must{} identify the rule and the stage at which it acts. Loading an already published grid token \mustnot{} quantize it again.
+
+\begin{algorithm}[htbp]
+\caption{Exact decimal-grid quantization}\label{alg:quantize}
+\begin{algorithmic}[1]
+\Require $x\in\Q$, decimal precision $d\in\mathbb{N}_0$
+\State Choose $(p,q)\in\mathbb{Z}\times\mathbb{Z}_{>0}$ with $p/q=10^d x$
+\State $(\ell,\rho)\gets\operatorname{divmod}(p,q)$, where $p=\ell q+\rho$ and $0\leq\rho<q$
+\If{$2\rho>q$ or ($2\rho=q$ and $\ell$ is odd)}
+\State $\ell\gets\ell+1$
+\EndIf
+\State \Return $\ell/10^d\in\Grid{d}$
+\end{algorithmic}
+\end{algorithm}
+
+The reference implements this definition as \id{quantize_decimal}. Python's \id{round(x, 3)} acts on the actual binary64 value of $x$, so its decimal result can differ from rounding a desired exact decimal input. The retained historical recipe is recorded as the actual call, rather than silently substituted with decimal-first quantization \autocite{pythonRound2026}.
+
+\subsection{Rounded and historical evaluation}
+The static companion also supports three binary64 arithmetic variants. Each reads the same binary64 inputs, rounds after every addition and keeps the prescribed order. \id{canonical-fp64-flat-v1} adds each arc to one accumulator across the canonically ordered routes. \id{canonical-fp64-grouped-v1} rounds within each route and then adds the rounded subtotals. \id{submitted-fp64-flat-v1} visits the routes in their submitted order. A stored calculation using such a profile retains that identity. For TD results from released checkers, \id{td-fold/1} and \id{td-fold/2} identify the historical evaluations. Appendix~\ref{app:solver-claims} explains how to retain an existing solver claim when the same routes are evaluated under a new profile.

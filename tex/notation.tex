@@ -1,7 +1,7 @@
 \section{Mathematical notation and arithmetic domains}\label{app:notation}
 This appendix defines the number sets, operators and routing symbols used in the prose and pseudocode. The definitions distinguish the numerical value of an operand from the arithmetic representation used to evaluate it. Domain annotations such as $f\in\Fbin$ and $x\in\Q$ make that choice explicit without prescribing a particular software type.
 
-For routing objects, sets use calligraphic capitals and ordered vectors use bold lowercase letters: $\mathcal{V}$ and $\mathcal{C}$ are the vertex and customer sets, $\mathcal{S}$ is a solution set, and $\mathbf{r}$ is a route vector. Angle brackets denote ordered vertex sequences and arcs. The ordered route enumeration $\mathbf{s}$ records how a solution is submitted, which matters for an order-sensitive evaluator. Both endpoints of $\mathbf{r}$ use the stored depot index 0, and the JSON route arrays encode only $\mathbf{r}_{\mathcal{C}}$. The numerical domains, parser operators and local arithmetic variables defined in this appendix remain specific to this specification.
+For routing objects, sets use calligraphic capitals and ordered vectors use bold lowercase letters. For example, $\mathcal{V}$ and $\mathcal{C}$ are the vertex and customer sets, $\mathcal{S}$ is a solution set, and $\mathbf{r}$ is a route vector. Angle brackets denote ordered vertex sequences and arcs. The ordered route enumeration $\mathbf{s}$ records how a solution is submitted, which matters for an order-sensitive evaluator. Both endpoints of $\mathbf{r}$ use the stored depot index 0, and the JSON route arrays encode only $\mathbf{r}_{\mathcal{C}}$. The numerical domains, parser operators and local arithmetic variables defined in this appendix remain specific to this specification.
 
 \subsection{Number sets and their relationships}
 We use $\mathbb{N}_0=\{0,1,2,\ldots\}$, $\mathbb{Z}$, $\Q=\{p/q:p\in\mathbb{Z},\ q\in\mathbb{Z}_{>0}\}$ and $\mathbb{R}$ for nonnegative integers, integers, rationals and reals, respectively. For a number set $X$, the notation $X_{\geq0}=\{x\in X:x\geq0\}$ and $X_{>0}=\{x\in X:x>0\}$ restricts its sign. We further define
@@ -12,7 +12,7 @@ We use $\mathbb{N}_0=\{0,1,2,\ldots\}$, $\mathbb{Z}$, $\Q=\{p/q:p\in\mathbb{Z},\
 \end{align}
 Thus $\Dyadic$ contains every dyadic rational, $\DecimalSet$ contains every rational with a finite decimal expansion, and $\Grid{d}$ fixes one decimal grid. For example, $215359/1000\in\Grid{3}$, while the binary64 value read from \id{215.359} lies outside that grid.
 
-The \href{https://en.wikipedia.org/wiki/IEEE_754}{IEEE 754} standard defines \href{https://en.wikipedia.org/wiki/Double-precision_floating-point_format}{binary64}, a double-precision binary floating-point format. A binary64 value occupies 64 bits: 1 sign bit, 11 exponent bits and 52 explicit fraction bits. For a normal finite value, let $s\in\{0,1\}$ be its sign bit, $E\in\{1,\ldots,2046\}$ its exponent field and $F\in\{0,\ldots,2^{52}-1\}$ its fraction field. Its exact numerical value is
+The \href{https://en.wikipedia.org/wiki/IEEE_754}{IEEE 754} standard defines \href{https://en.wikipedia.org/wiki/Double-precision_floating-point_format}{binary64}, a double-precision binary floating-point format. A binary64 value occupies 64 bits, with 1 sign bit, 11 exponent bits and 52 explicit fraction bits. For a normal finite value, let $s\in\{0,1\}$ be its sign bit, $E\in\{1,\ldots,2046\}$ its exponent field and $F\in\{0,\ldots,2^{52}-1\}$ its fraction field. Its exact numerical value is
 \begin{equation}\label{eq:binary64-normal}
 (-1)^s(1+F2^{-52})2^{E-1023},\qquad 1\leq E\leq2046.
 \end{equation}
@@ -28,12 +28,12 @@ The second set gives the nonzero subnormal values and the third gives the normal
 \begin{equation}
 \Fbin\subsetneq\Dyadic\subsetneq\DecimalSet\subsetneq\Q\subsetneq\mathbb{R}.
 \end{equation}
-For each $d\in\mathbb{N}_0$, $\Grid{d}\subseteq\DecimalSet$. A 3-decimal grid value need not belong to $\Fbin$, and a value in $\Fbin$ need not lie on the 3-decimal grid. An exact sum of binary64 operands belongs to $\Dyadic$, but can leave $\Fbin$.
+For each $d\in\mathbb{N}_0$, $\Grid{d}\subseteq\DecimalSet$. A 3-decimal grid value need not belong to $\Fbin$, and a value in $\Fbin$ need not lie on the 3-decimal grid. An exact sum of binary64 operands belongs to $\Dyadic$ and can lie outside $\Fbin$. A quotient of differences of such operands can lie outside $\Dyadic$. For example, interpolating the arrival between knots $(0,1)$ and $(3,5)$ at departure $1$ gives $1+(5-1)/3=7/3$. The domains of the TD route arithmetic therefore include general rational numbers.
 
 \subsection{Parsing, value preservation and rounding}
-The set $\JsonNum$ contains the character sequences permitted as JSON numbers. The exact decimal parser $\Dec:\JsonNum\to\DecimalSet$ interprets the token before any binary64 conversion. The map $\RatBin:\Fbin\hookrightarrow\Q$ is the value-preserving inclusion into exact rational arithmetic: for $f\in\Fbin$, $\RatBin(f)$ has precisely the same numerical value as $f$. Constructing an exact rational from a binary64 operand changes its arithmetic representation without reversing an earlier rounding.
+The set $\JsonNum$ contains the character sequences permitted as JSON numbers. The exact decimal parser $\Dec:\JsonNum\to\DecimalSet$ interprets the token before any binary64 conversion. The map $\RatBin:\Fbin\hookrightarrow\Q$ is the value-preserving inclusion into exact rational arithmetic. For $f\in\Fbin$, $\RatBin(f)$ has precisely the same numerical value as $f$. Constructing an exact rational from a binary64 operand changes its arithmetic representation without reversing an earlier rounding.
 
-For example, Algorithm~\ref{alg:interpret-token} applies the following path to the numerical token $t=\texttt{0.1}\in\JsonNum$ under the exact-binary profile:
+For example, Algorithm~\ref{alg:interpret-token} applies the following path to the numerical token $t=\texttt{0.1}\in\JsonNum$ under either exact binary64 profile.
 \begin{align}
 \Dec(t)&=\frac{1}{10}\in\DecimalSet,\\
 f&=\RoundBinary\bigl(\Dec(t)\bigr)\in\Fbin,\\
@@ -41,11 +41,11 @@ x&=\RatBin(f)=\frac{3602879701896397}{36028797018963968}\in\Dyadic\subseteq\Q.
 \end{align}
 Here $x$ equals the numerical value stored in $f$, while $x\ne\Dec(t)$. Subsequent $+$ operations on $x$ are exact rational additions. Subsequent $\oplus_{64}$ operations on $f$ round after each addition. In Python, the value-preserving conversion is \id{Fraction.from_float(f)}. Directly applying \id{Fraction("0.1")} instead implements the decimal interpretation.
 
-The rounding operator $\RoundBinary:\mathbb{R}\to\FbinExt$, with $\FbinExt=\Fbin\cup\{-\infty,+\infty\}$, uses the specified binary64 nearest-even rule and IEEE overflow behavior. Every accepted binary64 operand or accumulator must remain in $\Fbin$. Arithmetic overflow is an error outcome, not an accepted infinite cost. The operator $a\oplus_{64}b=\RoundBinary(\RatBin(a)+\RatBin(b))$ is defined for $a,b\in\Fbin$ and can overflow. Ordinary $+$, $-$ and comparisons in exact algorithms use their mathematical meanings without an implicit rounding step. Ordering and maximum on finite binary64 values use the order inherited from $\Q$.
+The rounding operator $\RoundBinary:\mathbb{R}\to\FbinExt$, with $\FbinExt=\Fbin\cup\{-\infty,+\infty\}$, uses the specified binary64 nearest-even rule and IEEE overflow behavior. An input that overflows binary64 is invalid. The exact evaluation may produce an objective larger than every finite binary64 value. Section~\ref{sec:results} preserves its fraction and records overflow of the display projection separately. The operator $a\oplus_{64}b=\RoundBinary(\RatBin(a)+\RatBin(b))$ is defined for $a,b\in\Fbin$ and can overflow. Ordinary $+$, $-$ and comparisons in exact algorithms use their mathematical meanings without an implicit rounding step. Ordering and maximum on finite binary64 values use the order inherited from $\Q$.
 
-For $d\in\mathbb{N}_0$, decimal quantization is $Q_d:\mathbb{R}\to\Grid{d}$, defined by $Q_d(x)=10^{-d}\operatorname{roundEven}(10^d x)$, where $\operatorname{roundEven}:\mathbb{R}\to\mathbb{Z}$ selects the nearest integer with ties to even. Algorithm~\ref{alg:quantize} evaluates this map for $x\in\Q$ using integer arithmetic. The symbols $Q_d$, $\Q$ and the vehicle capacity $Q$ denote different objects: a function, a number set and an integer resource bound.
+For $d\in\mathbb{N}_0$, decimal quantization is $Q_d:\mathbb{R}\to\Grid{d}$, defined by $Q_d(x)=10^{-d}\operatorname{roundEven}(10^d x)$, where $\operatorname{roundEven}:\mathbb{R}\to\mathbb{Z}$ selects the nearest integer with ties to even. Algorithm~\ref{alg:quantize} evaluates this map for $x\in\Q$ using integer arithmetic. The symbols $Q_d$, $\Q$ and the vehicle capacity $Q$ denote a quantization function, a number set and an integer resource bound, respectively.
 
-\subsection{Symbols and notations}
+\subsection{Symbols and notation}
 The table below collects the main symbols, including quantities local to an algorithm. A reused letter is distinguished by its indices and stated context. We write $\bot$ for an absent mathematical value, corresponding to null in the relevant JSON field. The symbol $\gets$ denotes assignment, $\in$ membership, $\subseteq$ inclusion and $\subsetneq$ proper inclusion.
 
 \begingroup
@@ -77,13 +77,12 @@ $\RatBin$ & Inclusion $\Fbin\hookrightarrow\Q$ preserving the exact numerical va
 $\RoundBinary$ & Binary64 nearest-even rounding $\mathbb{R}\to\FbinExt$, with overflow checked before acceptance.\\
 $+,\ \oplus_{64}$ & Exact addition and addition followed by binary64 rounding, respectively.\\
 $Q_d,\operatorname{roundEven}$ & Decimal quantization to $\Grid{d}$ and nearest-even rounding to $\mathbb{Z}$.\\
-$\mathcal{P},P$ & Registered integrated profiles and the selected profile $P\in\mathcal{P}$.\\
-$\mathbb{A}_P$ & Admissible arc and temporal value set for profile $P$, with $\mathbb{A}_P\subseteq\Q_{\geq0}$, defined in Equation~\ref{eq:profile-domains}.\\
-$I$ & Interpreted materialized static instance satisfying the declared profile's domain restrictions.\\
+$P$ & Numerical evaluation profile of the benchmark revision.\\
+$I$ & Materialized instance, including the applicable matrix or arc functions and the remaining problem data.\\
 $\mathcal{V},\mathcal{C},n$ & Vertices $\mathcal{V}=\mathcal{C}\cup\{0\}$, customers $\mathcal{C}=\{1,\ldots,n\}$ and customer count $n=|\mathcal{C}|\in\mathbb{N}_0$. Vertex 0 is the depot.\\
 $q_i,Q$ & Demand and vehicle capacity in $\mathbb{N}_0\cap\Fbin$, with $q_0=0$.\\
 $K,\bot$ & Fleet upper bound in $\mathbb{N}_0\cup\{\bot\}$. The symbol $\bot$ denotes an absent value (JSON null), imposing no fleet limit.\\
-$c,c_{ij}$ & Arc matrix $c\in\mathbb{A}_P^{(n+1)\times(n+1)}$ and cost $c_{ij}\in\mathbb{A}_P$ from $i\in\mathcal{V}$ to $j\in\mathcal{V}$. Every arc value is nonnegative by contract and $c_{ii}=0$.\\
+$c,c_{ij}$ & Static arc matrix and its directed entry from $i$ to $j$. The matrix has shape $(n+1)\times(n+1)$, entries in $\FbinNonneg$ and $c_{ii}=0$.\\
 $e_i,l_i,s_i$ & Window endpoints and service duration, with $e_i\leq l_i$ and $s_0=0$. Customer windows constrain service start. The depot window bounds departure and return.\\
 $\mathbf{r},m$ & Route vector $\mathbf{r}=\langle v_1=0,v_2,\ldots,v_{m-1},v_m=0\rangle$ of length $m=|\mathbf{r}|\geq3$.\\
 $\mathbf{r}_{\mathcal{C}}$ & Nonempty customer subsequence $\langle v_2,\ldots,v_{m-1}\rangle\in\mathcal{C}^{m-2}$, encoded by each JSON route array.\\
@@ -91,19 +90,19 @@ $\operatorname{arcs}(\mathbf{r})$ & Ordered arc sequence $\langle\langle v_j,v_{
 $\mathcal{S},|\mathcal{S}|$ & Set of routes forming a solution, and its realized fleet size. For $n=0$, $\mathcal{S}=\emptyset$ is permitted.\\
 $\mathbf{s},\mathbf{r}_k$ & Submitted ordered enumeration $\mathbf{s}=\langle\mathbf{r}_1,\ldots,\mathbf{r}_{|\mathcal{S}|}\rangle$, with route index $k\in\{1,\ldots,|\mathcal{S}|\}$. Duplicate entries are rejected before forming $\mathcal{S}$.\\
 $\operatorname{canon}(\mathcal{S})$ & Lexicographically sorted enumeration of the validated route set, preserving each route's internal customer order.\\
-$\mathbf{s}_P$ & Enumeration prescribed by the rounded profile: submitted $\mathbf{s}$ or $\operatorname{canon}(\mathcal{S})$.\\
 $c_{\mathbf{r}},C(\mathcal{S}),C$ & Route cost, solution routing cost and current exact accumulator, in $\Q_{\geq0}$ for exact profiles.\\
-$t_v$ & Earliest static service-start time for customer $v$. At the depot, $t_0=e_0$ denotes initial departure. Exact-profile values belong to $\Q_{\geq0}$, rounded-profile values to $\FbinNonneg$.\\
-$t_0^{\mathrm{ret}}$ & Depot return check time after any waiting until $e_0$, distinct from the initial $t_0$. The depot has zero service duration.\\
-$T,U$ & Solution and route accumulators in $\Fbin$ in the rounded objective algorithm.\\
-$0_{64}$ & Positive binary64 zero used to initialize a rounded accumulator. Its numerical value is 0.\\
+$u_j,t_j,d_j$ & Arrival at customer $j$, service start and departure after service. When a window is present, $t_j=\max(u_j,e_j)$ and $t_j\leq l_j$. In both settings $d_j=t_j+s_j$.\\
+$d_0$ & Initial depot departure. For the earliest static schedule with a depot window, $d_0=e_0$. In TD routing $d_0$ may be chosen from the feasible departure set.\\
+$[h_0,h_1]$ & Common closed TD arc departure horizon with $0\leq h_0<h_1$. Every arc departure lies within it. Route constraints may restrict feasible initial departures to a single time.\\
+$\alpha_{ij}(t)$ & Arrival clock time at $j$ after entering directed arc $(i,j)$ at time $t$. The difference $\alpha_{ij}(t)-t$ is its travel time.\\
+$(x_k,y_k)$ & Stored departure abscissa and arrival ordinate of the $k$th knot on one ATF. Both are finite binary64 operands.\\
+$y^-(x),y^+(x)$ & First and last stored ordinates at abscissa $x$. The first is attained at $x$. The last is the right-hand limit whenever a following piece exists.\\
+$D_{\mathbf r},\delta_{\mathbf r}(t)$ & Feasible initial depot departures of route $\mathbf r$ and its return clock time for $t\in D_{\mathbf r}$.\\
+$\Delta_{\mathbf r}^*,t_{\mathbf r}^*$ & Minimum elapsed route duration and earliest feasible departure attaining it, defined for a feasible route by Equations~\ref{eq:td-route-duration} and~\ref{eq:td-earliest-minimizer}.\\
+$F$ & Fixed charge per used vehicle in the TD objective \id{FleetCostDuration}. Its unit is the instance's duration unit. The same letter in Equation~\ref{eq:binary64-normal} denotes the binary64 fraction field.\\
 $\widehat C$ & Rounded binary64 projection $\RoundBinary(C)\in\FbinExt$. Only a finite value is emitted as numeric compatibility \id{cost}.\\
 $S,b,d$ & Positive integer scaling factor $S$, binary-scale exponent $b\in\mathbb{N}_0$ and decimal precision $d\in\mathbb{N}_0$. Typical scales are $2^b$ and $10^d$.\\
 $p,q,\ell,\rho$ & In Algorithm~\ref{alg:quantize}, rational numerator $p\in\mathbb{Z}$, denominator $q\in\mathbb{Z}_{>0}$, division quotient $\ell\in\mathbb{Z}$ and integer remainder $0\leq\rho<q$. The denominator $q$ is distinct from a customer demand $q_i$.\\
-$N$ & Nonnegative squared Euclidean distance, computed from the coordinates under the selected generation recipe.\\
-$R$ & Positive exact reference cost $R\in\Q_{>0}$ for a scalar signed reference deviation.\\
-$U,L,z^{\circledast}$ & In the proof discussion, feasible exact upper bound $U\in\Q$, rigorous lower bound $L\in\mathbb{R}$ and scalar optimum $z^{\circledast}$ of the target problem. This $U$ is distinct from the rounded route accumulator.\\
-$\pi_i,\eta$ & Real dual value for customer $i$ and nonnegative rigorous reduced-cost error bound $\eta\in\mathbb{R}_{\geq0}$.\\
-$\kappa,\delta$ & Target fleet size $\kappa\in\mathbb{N}_0$ in the fixed-fleet proof and positive rational objective-lattice spacing $\delta\in\Q_{>0}$.\\
+$N$ & Number of vertices, $N=n+1$, in the canonical materialization streams.\\
 \end{longtable}
 \endgroup

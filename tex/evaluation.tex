@@ -1,100 +1,30 @@
-\section{Static evaluation profiles}\label{sec:profiles}
-% The earlier working name \id{exact-fp64-v1} refers to the proposal now consistently named \id{binary64-exact-v1}.
-This section defines the proposed profile registry $\mathcal{P}$ and separates defaults from alternatives. Each profile $P\in\mathcal{P}$ identifies instance interpretation, objective arithmetic, temporal arithmetic, ordering and result semantics together. The suffix \id{-v1} identifies a revision of that profile's numerical contract. Published profile identifiers retain their meaning across specification and library releases. A later specification may retain an existing profile unchanged while introducing a new revision of an affected profile. The 7 names below form the proposed static registry, rather than names already implemented by released packages.
+\section{Feasibility and cost of a submitted solution}\label{sec:exact}\label{sec:profiles}
 
-\begin{table}[htbp]
-\small
-\begin{tabularx}{\linewidth}{@{}p{5.2cm}XX@{}}
-\toprule
-Profile & Instance values & Objective and temporal evaluation\\
-\midrule
-\id{binary64-exact-v1} & Exact values of parsed binary64 & Exact rational operations, zero tolerance.\\
-\id{integer-exact-v1} & Binary64, restricted to integral arc and temporal values & Exact integers or equivalent rationals, zero tolerance.\\
-\id{decimal-exact-v1} & Exact original decimal tokens & Exact rational operations, zero tolerance. Alternative interpretation.\\
-\id{decimal-grid-3-v1} & Exact decimal tokens on the $10^{-3}$ grid & Exact scaled integers or equivalent rationals. Alternative interpretation.\\
-\id{canonical-fp64-flat-v1} & Binary64 & Canonical routes, flat binary64 objective, binary64 forward timing.\\
-\id{canonical-fp64-grouped-v1} & Binary64 & Canonical routes, per-route binary64 totals then binary64 total, binary64 timing.\\
-\id{submitted-fp64-flat-v1} & Binary64 & Submitted route order, flat binary64 objective, binary64 timing.\\
-\bottomrule
-\end{tabularx}
-\caption{Integrated profiles. The last 3 are fully specified operational alternatives, rather than assertions of complete historical-release compatibility.}
-\end{table}
-\FloatBarrier
+A submission specifies which customers each vehicle visits and in what order. From these sequences we must decide whether the vehicles can serve all customers and, if so, what the declared objective is worth. The two questions already differ on a route with constant travel times. A vehicle can wait for a customer to open without changing the travel cost of its tour. That wait does increase the time the vehicle spends away from the depot. We distinguish these quantities throughout, since static benchmarks charge for the arcs traversed, whereas time-dependent benchmarks charge for the elapsed duration of the route.
 
-The exact static profiles share the feasibility recurrence and objective in Section~\ref{sec:exact}. The rounded static profiles share the structural rules and use the operation-specific recurrence in Appendix~\ref{sec:rounded}. None uses an epsilon. Adding a tolerance or changing depot initialization requires a different profile version. The integer profile \must{} reject any interpreted nonintegral arc or temporal value. Decimal-grid divisibility \mustnot{} be inferred from binary64 values that merely print with 3 digits.
+Both profiles start from the instance identified in Section~\ref{sec:materialization}. Under \id{binary64-exact-v1} (static) and \id{td-binary64-exact-v1} (TD), each finite binary64 operand $f$ contributes its exact rational value $\RatBin(f)$. Thus a service start exactly at its deadline satisfies that constraint, and any strictly later start violates it, however small the excess. The same interpretation applies to arc values, the horizon, window endpoints, service durations and any fixed vehicle charge. Appendix~\ref{app:notation} collects the notation.
 
-\subsection{Proposed family defaults}
-For new static revisions, Sintef2008, Poryos2026 and Mamut2026 select \id{binary64-exact-v1}. Dimacs2021 and Ortec2022 select \id{integer-exact-v1}, subject to a complete eligibility check. For their integral inputs, this restriction gives the same numerical results as \id{binary64-exact-v1}. The Poryos/Mamut decision explicitly retains binary64 instance semantics after generation or rederivation. Their decimal-grid alternative is separately identified and is not their default.
+\subsection{Which customers does each vehicle serve?}
 
-For example, binary64 reading of the Poryos token \id{215.359} yields $\frac{7577271188678771}{35184372088832}$. Decimal reading yields $215359/1000$. An integer accumulator at scale 1000 evaluates the latter exactly, but cannot represent the former at that scale. A dyadic accumulator can evaluate the former exactly using a sufficient power-of-2 scale. Recovering the decimal grid from a previously loaded binary64 value requires an explicit conversion contract and changes the evaluated values.
+Let $\mathcal C=\{1,\ldots,n\}$ be the customer set and let vertex $0$ be the depot. A route is a vector $\mathbf r=\langle v_1=0,v_2,\ldots,v_{m-1},v_m=0\rangle$ of length $m\geq3$. Its JSON array contains just the nonempty customer subsequence $\mathbf r_{\mathcal C}=\langle v_2,\ldots,v_{m-1}\rangle$. For example, the array \id{[2,1]} prescribes the three directed arcs $(0,2)$, $(2,1)$ and $(1,0)$. Reversing the array can change both cost and feasibility.
 
-Any family-default selection \must{} appear in a versioned benchmark manifest. A package upgrade or a local arithmetic flag \mustnot{} reinterpret an existing benchmark revision. Alternative evaluations \may{} be returned side by side for diagnostics, but each \must{} carry its identity. Default BKS, gaps and reference caches \must{} use the manifest-selected authority.
+Before checking visits, we validate the instance. The static matrix has one row and column per vertex, including the depot, with $c_{ij}\geq0$ and $c_{ii}=0$. Customer demands $q_i$ and vehicle capacity $Q$ are nonnegative integers exactly representable in binary64, and the depot demand is $q_0=0$. Each supplied service duration satisfies $s_i\geq0$ and each window satisfies $0\leq e_i\leq l_i$. The checker must reject a nonzero depot service duration, even on a route whose customers have no windows. In the TD model all arcs share the finite departure horizon $0\leq h_0<h_1$. Windows and the route itself may restrict the feasible departures to a single instant within that horizon.
 
-\subsection{Historical and diagnostic evaluators}
-% Internal release inspection: /home/onyr/code/phd/tdvrptw-workspace/reports/audits/2026-10-20-s119-checker-walkthrough/verify_examples.py and examples.json. Historical comparison sources: /home/onyr/code/phd/report/numerical-checker-contracts/ and /home/onyr/code/phd/routing-numerical-contracts/.
-An archived historical result retains the identity of the actual implementation and its input adapters. In our inspection of library tags 0.11 and 0.12, we distinguish Python integer/float behavior, model validation, error ordering and time initialization from the requirements of the new rounded profiles. A frozen-release label \must{} identify the tag or distribution hash, source hashes, interpreter and invocation. The simple name \id{legacy-fp64-v1} is insufficient without those details.
+We first read the submitted enumeration $\mathbf s$ with all entries present. Every entry in a customer subsequence must be an index in $\mathcal C$, and every customer must occur exactly once across the enumeration. Checking this before forming a set detects, for example, a file that submits the same route twice. For every route we require $\sum_{j=2}^{m-1}q_{v_j}\leq Q$. Empty customer sequences are invalid. If a fleet limit $K$ is supplied, the number of routes must be at most $K$. With $n=0$, the empty solution is admissible and its cost is zero.
 
-An \id{fsum}-based objective and a fixed-precision Decimal objective are useful diagnostics. They are not additional authoritative profiles in this draft. Python documents \id{math.fsum} as an accurate floating-point sum with platform-related caveats. It returns a float, rather than an exact total or a certified interval. Applying it to already rounded route subtotals also loses information from the original arcs \autocite{pythonMath2026}. A diagnostic record \must{} identify whether its operands were original arcs or rounded route totals, its order, precision, rounding context and implementation.
+Once these checks succeed, $\mathcal S$ denotes the set of routes and $|\mathcal S|$ is the realized fleet size. For storage we sort the routes lexicographically by their customer subsequences. This gives $\operatorname{canon}(\mathcal S)$ without changing any visit order within a route. The exact departure and duration for each TD route accompany that route in this stored order (Section~\ref{sec:results}).
 
-\section{Exact static evaluation}\label{sec:exact}
-% Internal notation authority: /home/onyr/code/phd/phd-thesis-workspace/manuscript/tex/00c0-notation-system.tex and 01-foundations.tex, with rulings in /home/onyr/code/phd/phd_note_vault/docs/thesis/notations/notations.md. Adopt the shared routing conventions without importing the full thesis notation system or its duplicated-depot model.
-This section defines structural feasibility, temporal feasibility and objective calculation. We denote a solution by a set of route vectors $\mathcal{S}$. Each route is an ordered vertex sequence $\mathbf{r}=\langle v_1=0,v_2,\ldots,v_{m-1},v_m=0\rangle$, with $m=|\mathbf{r}|\geq3$, whose nonempty customer subsequence is $\mathbf{r}_{\mathcal{C}}=\langle v_2,\ldots,v_{m-1}\rangle\in\mathcal{C}^{m-2}$. The JSON field \id{routes} stores these customer subsequences, with both depot endpoints implicit.
+\subsection{From depot departure to depot return}
 
-A submitted file also determines an ordered enumeration $\mathbf{s}$ of the routes. Validation \must{} inspect this enumeration before forming its underlying set $\mathcal{S}$, so duplicate route entries or customer visits cannot disappear through set conversion. Every customer $i\in\mathcal{C}$ \must{} appear exactly once across the submitted customer subsequences. A customer subsequence \mustnot{} contain the depot or an out-of-range index. Each route must satisfy $\sum_{j=2}^{m-1}q_{v_j}\leq Q$. For a structurally valid submission, $\mathbf{s}=\langle\mathbf{r}_1,\ldots,\mathbf{r}_{|\mathcal{S}|}\rangle$ enumerates the distinct members of $\mathcal{S}$. When a fleet limit $K$ is supplied, require $|\mathcal{S}|\leq K$. With $n=0$, the empty enumeration and $\mathcal{S}=\emptyset$ are permitted and have objective 0. Empty customer subsequences are rejected rather than counted as vehicles.
+Consider a vehicle that leaves vertex $i$ at time $d_i$. In the static problem with time windows, the matrix entry $c_{ij}$ is both the cost and travel time of the directed arc $(i,j)$. In the TD problem, the Arrival Time Function (ATF) $\alpha_{ij}$ gives the arrival clock time at $j$ for a departure at $i$. The common forward calculation at a customer $j$ is
+\begin{align*}
+ u_j &= \begin{cases} d_i+c_{ij} & \text{static},\\ \alpha_{ij}(d_i) & \text{TD},\end{cases} & \text{(arrival)}\\
+ t_j &= \begin{cases} \max(u_j,e_j) & \text{with window }[e_j,l_j],\\ u_j & \text{without a window},\end{cases} & \text{(service start)}\\
+ d_j &= t_j+s_j. & \text{(departure)}
+\end{align*}
 
-\subsection{Canonical route order and objective}
-For deterministic storage, let $\operatorname{canon}(\mathcal{S})$ denote the ordered enumeration of the validated route set sorted lexicographically by its customer subsequences. Since customer coverage is unique, first customers are distinct, so this agrees with sorting by first customer. Customer order within a route is retained. No route reversal, rotation, splitting or merging is performed. Such transformations can affect temporal feasibility even if a cost matrix is symmetric.
+The window constrains the start of service, so we require $t_j\leq l_j$ whenever the window is present. Service may finish after $l_j$. On the last arc we use the same arrival rule with destination $0$ and check the depot return deadline $l_0$ when specified. The elapsed duration ends when the vehicle reaches the depot. For static capacitated routing without time windows the coverage, capacity and fleet checks suffice for feasibility.
 
-For a route vector $\mathbf{r}$, define its ordered arc sequence as $\operatorname{arcs}(\mathbf{r})=\langle\langle v_j,v_{j+1}\rangle\rangle_{j=1}^{m-1}$. Exact route and solution costs are
-\begin{align}
-c_{\mathbf{r}}&=\sum_{j=1}^{m-1}c_{v_jv_{j+1}}\in\Q_{\geq0},\\
-C(\mathcal{S})&=\sum_{\mathbf{r}\in\mathcal{S}}c_{\mathbf{r}}\in\Q_{\geq0}.
-\end{align}
-The exact profiles evaluate these expressions exactly. All depot arcs count. Cost excludes waiting and service durations. For \id{MonoCost}, compare $(C)$ lexicographically. For \id{HierarchicalVehicleCost}, compare $(|\mathcal{S}|,C)$. A weighted vehicle penalty is not a substitute for this hierarchy. The objective is declared by the benchmark manifest and \mustnot{} be inferred from the numerical profile or instance filename.
+In the static problem with time windows we can start at depot opening, $d_0=e_0$. Later departures can only delay arrival on a constant-time arc. At a customer, both waiting until opening and adding service preserve that order. Induction along the route therefore shows that this schedule gives the earliest attainable service start at each customer and the earliest return to the depot. If it misses a deadline, every schedule for the same order misses that deadline. Starting the clock at the declared opening matters when $e_0>0$.
 
-Exact addition is associative and commutative, so changing the enumeration $\mathbf{s}$ or regrouping route costs does not change $C(\mathcal{S})$. These changes also preserve independent route feasibility. Canonical order supports stable storage and provenance, rather than repairing exact arithmetic. Exact ties \must{} be recognized before display rounding. On equality of the complete objective key, the store \must{} retain the current incumbent. Section~\ref{sec:results} gives the same comparison rule for TD solutions.
-
-\subsection{Temporal recurrence}
-For static VRPTW, $t_0=e_0$ is the earliest departure from the depot. At each customer $v\in\mathcal{C}$, $t_v\in\Q_{\geq0}$ denotes the earliest service-start time. For each customer $j\in\mathcal{C}$ after predecessor $i\in\mathcal{V}$, compute
-\[
-t_j=\max(e_j,t_i+s_i+c_{ij})\in\Q_{\geq0}.
-\]
-Here $t_i+s_i+c_{ij}$ is the arrival at $j$, and $t_j+s_j$ is its departure time. Require $t_j\leq l_j$. The window constrains service start, so service completion may exceed $l_j$. Waiting before service is allowed. Upon return from the last customer $i$, define $t_0^{\mathrm{ret}}=\max(e_0,t_i+s_i+c_{i0})\in\Q_{\geq0}$ and require $t_0^{\mathrm{ret}}\leq l_0$. The departure and return checks use the same depot window. There is no additional route-duration constraint in this core.
-
-Every operation and comparison above is exact in the selected exact profile. Even when the inputs belong to $\Fbin$, intermediate arrival times and costs may lie in $\Q\setminus\Fbin$. We do not round arrivals, service starts, departures, arc sums or route subtotals to binary64. For static nonnegative travel times with no independent duration constraint, this earliest-start schedule suffices to test whether any feasible schedule exists for the route order: delaying departure or service cannot improve an arrival relative to an upper deadline. This reasoning does not extend unchanged to TD travel times or route-duration objectives.
-
-The audited SINTEF instances open the depot at $e_0=0$. The frozen historical checker initializes its clock at 0. On a revision with a later opening time, the static checker initializes its departure at that opening time.
-
-\begin{algorithm}[htbp]
-\caption{Exact evaluation of a materialized static solution}\label{alg:exact-evaluation}
-\begin{algorithmic}[1]
-\Require Exact-profile instance $I$, submitted route enumeration $\mathbf{s}$, declared objective
-\State Validate dimensions, domain and profile restrictions of $I$
-\State Validate nonempty customer subsequences, indices, unique coverage, capacity and fleet
-\State $\mathcal{S}\gets\{\mathbf{r}\:|\:\mathbf{r}\text{ occurs in }\mathbf{s}\}$
-\State $C\gets0$ \Comment{$C\in\Q_{\geq0}$}
-\For{each route $\mathbf{r}$ in $\operatorname{canon}(\mathcal{S})$}
-\State $i\gets0$ \Comment{$i\in\mathcal{V}$}
-\If{VRPTW} \State $t_0\gets e_0\in\Q_{\geq0}$ \EndIf
-\For{each customer $j$ in $\mathbf{r}_{\mathcal{C}}$}
-\State $C\gets C+c_{ij}$
-\If{VRPTW}
-\State $t_j\gets\max(e_j,t_i+s_i+c_{ij})\in\Q_{\geq0}$
-\If{$t_j>l_j$} \State \Return invalid, without an authoritative objective \Comment{(client TW violation)} \EndIf
-\EndIf
-\State $i\gets j$
-\EndFor
-\State $C\gets C+c_{i0}$
-\If{VRPTW}
-\State $t_0^{\mathrm{ret}}\gets\max(e_0,t_i+s_i+c_{i0})\in\Q_{\geq0}$
-\If{$t_0^{\mathrm{ret}}>l_0$} \State \Return invalid, without an authoritative objective \Comment{(return depot TW violation)} \EndIf
-\EndIf
-\EndFor
-\State \Return valid, exact $C$, and key $(C)$ or $(|\mathcal{S}|,C)$
-\end{algorithmic}
-\end{algorithm}
-
-\subsection{Equivalent exact implementations}
-The reference uses arbitrary-precision rationals for readability, but the contract prescribes results rather than Python's \id{Fraction}. For decimal-grid inputs $x\in\Grid{d}$, \href{https://en.wikipedia.org/wiki/Fixed-point_arithmetic}{fixed-point arithmetic} stores $Sx\in\mathbb{Z}$ at the common scale $S=10^d\in\mathbb{Z}_{>0}$. Execute the same additions, maximums and comparisons with integers, then divide the objective by $S$. This is equivalent only if every consumed arc and temporal value lies exactly on the declared grid and no intermediate overflows.
-
-For binary64-exact inputs, choose $b\in\mathbb{N}_0$ at least as large as the largest exponent of 2 in any reduced denominator of the arc and temporal values. Then $2^b\RatBin(f)\in\mathbb{Z}$ for every consumed $f\in\Fbin$. Scale by $2^b$, execute the same integer recurrence and divide the final objective by $2^b$. Subnormals can require $b=1074$. A superaccumulator or another exact dyadic representation is also permitted. A finite-width implementation \must{} justify its full intermediate range or detect overflow and refine. The observed range of some incumbent totals is not a general range proof for all routes or solver states.
+For example, suppose both legs of a one-customer route take $2$ time units, the customer accepts service starts in $[7,9]$, service takes $2$, and the depot window is $[0,15]$. A vehicle leaving at $0$ arrives at $2$, waits until $7$, finishes service at $9$ and returns at $11$. The route is feasible. Its static travel cost is $2+2=4$, yet the vehicle has spent $11$ time units away from the depot. We now keep the same customer sequence and allow the departure time to vary.

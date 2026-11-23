@@ -1,0 +1,14 @@
+\section{Historical results and solver self-reports}\label{app:solver-claims}
+A BKS without \id{metadata.optimality} has no attached certificate. When present, this optional object records one kind of claim, \id{solver-reported-optimal}. Its required fields are \id{status}, \id{target_profile} and \id{solver}, identifying the solver and the run's version or revision when known. Retain the historical campaign identifier or evidence reference if available. A reported optimum and dual bound may be included when their original values and meaning can be established. These values describe what the solver reported for that target. The checker records verification of a submitted route in \id{metadata.standard.evaluation}.
+
+For example, a Kayros run targeting \id{td-fold/1} can accompany a BKS whose routes have since been checked under \id{td-binary64-exact-v1}. The following excerpt shows the claim for a historical Kayros 1.5.1 run.
+\begin{verbatim}
+"optimality": {
+  "status": "solver-reported-optimal",
+  "target_profile": "td-fold/1",
+  "solver": "Kayros 1.5.1",
+  "campaign": "Grid'5000 job 6830467, memory retry 6830998"
+}
+\end{verbatim}
+
+During migration, retain the historical claim with its original target, solver and evidence. The \href{https://github.com/ANR-MAMUT/MAMUT-routing-archive-2026-11}{released v0.12 records} include routes repriced under \id{td-fold/2}. Some records updated the field named \id{proven_optimum} while keeping the solver\textquotesingle{}s historical dual bound. Recover the original solver-reported objective from its run or the earlier record where available. Omit a value whose origin cannot be established. Repricing under the new profile supplies a feasible incumbent value for that revision. A self-report targeting the new profile requires a solver run making that claim for the new target.

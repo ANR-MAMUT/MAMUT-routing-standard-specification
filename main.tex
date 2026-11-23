@@ -57,7 +57,7 @@
 \begin{singlespace}
 \maketitle
 \begin{abstract}
-We specify how a MAMUT-routing benchmark revision assigns numerical meaning to an instance, a route and its reported cost. Materialization fixes the finite binary64 operands, and exact evaluation determines what those operands mean for a route. Static benchmarks use a cost matrix. Time-dependent benchmarks use arrival-time functions and optimize the departure of each route. Both settings compare incumbents using the exact objective and derive display values from it. We give the shared contracts, the evaluation rules specific to each setting and worked examples of their consequences.
+We specify how a MAMUT-routing benchmark revision assigns numerical meaning to an instance, a route and its reported cost. The instance manifest binds the source artifacts by hash. A reader can load the published arc data or reproduce them with pinned code and compare their complete binary64 digest. Once these operands are fixed, both readers can evaluate the submitted routes exactly. Static benchmarks use a cost matrix. Time-dependent benchmarks use arrival-time functions and optimize the departure of each route. Both settings compare incumbents using the exact objective and derive display values from it. We give the shared contracts, the evaluation rules specific to each setting and worked examples of their consequences.
 \end{abstract}
 
 \begin{center}
@@ -82,21 +82,22 @@ Christine Solnon & \href{https://orcid.org/0000-0002-0919-496X}{0000-0002-0919-4
 \tableofcontents
 \clearpage
 \input{tex/foundations}
-\input{tex/contracts}
+\input{tex/instance-materialization}
 \input{tex/evaluation}
 \input{tex/td-core}
 \input{tex/results}
-\input{tex/adoption}
 \printbibliography[heading=bibintoc]
 \clearpage
 \appendix
 \input{tex/notation}
 \clearpage
-\input{tex/evidence}
-\FloatBarrier
-\input{tex/static-rounded}
-\FloatBarrier
-\input{tex/td-evidence}
+\input{tex/materialization-format}
+\clearpage
+\input{tex/implementation-guide}
+\clearpage
+\input{tex/alternative-readings}
 \clearpage
 \input{tex/td-attainment}
+\clearpage
+\input{tex/solver-claim}
 \end{document}
