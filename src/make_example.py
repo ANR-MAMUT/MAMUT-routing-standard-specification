@@ -30,7 +30,7 @@ def identify(path):
 
 
 def publish(prefix, manifest, result, checker, backend):
-    manifest_path = write(f"{prefix}-manifest.json", manifest)
+    manifest_path = write(f"{prefix}-instance.manifest.json", manifest)
     evaluation = dict(checker=checker, backend=backend, source_sha256=sha(ROOT / checker),
                       runtime=dict(python=sys.version, platform=platform.platform()),
                       verification_status="incumbent-verified", note="Synthetic specification fixture.")
@@ -57,7 +57,7 @@ def generate():
     instance = ref.load_instance(instance_path.read_text(), profile, problem)
     result = ref.evaluate(instance, [[1, 2]], objective)
     manifest = dict(specification=SPECIFICATION, family="SyntheticExample",
-                    benchmark_revision="synthetic-v1", instance_name="two-customers",
+                    benchmark_revision="r1", instance_name="two-customers",
                     problem=problem, objective=objective, default_profile=profile,
                     units=dict(cost="fixture-unit", time="fixture-unit"), cost_is_travel_time=True,
                     instance=identify(instance_path), sidecars=[],
@@ -79,7 +79,7 @@ def generate_td():
     if atfs["horizon"] != instance["horizon"] or atfs["num_customers"] != instance["num_customers"]:
         raise ValueError("the fixture descriptor and ATF header disagree")
     digest = atf_digest(instance["num_customers"] + 1, instance["horizon"], atfs["arcs"])
-    manifest = dict(specification=SPECIFICATION, family="SyntheticExample", benchmark_revision="synthetic-td-v1",
+    manifest = dict(specification=SPECIFICATION, family="SyntheticExample", benchmark_revision="r1",
                     instance_name=instance["instance_name"], problem="TDVRPTW", objective="FleetCostDuration",
                     default_profile="td-binary64-exact-v1", units=dict(cost="fixture-unit", time="fixture-unit"),
                     instance=identify(instance_path), sidecars=[identify(sidecar)],

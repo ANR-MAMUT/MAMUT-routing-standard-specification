@@ -57,7 +57,7 @@ def validate():
     check((ROOT / "src/reference.py").is_file() and "\\input{tex/td-core}" in main
           and "\\lstinputlisting" not in main + tex, "TD core and separate static code companion")
 
-    manifest_path = ROOT / "example-manifest.json"
+    manifest_path = ROOT / "example-instance.manifest.json"
     manifest = json.loads(manifest_path.read_text())
     result = json.loads((ROOT / "example-result.json").read_text())
     standard = result["metadata"]["standard"]
@@ -97,7 +97,7 @@ def validate():
     artifacts = [p for p in ROOT.rglob("*") if p.is_file() and
                  (p.suffix in (".tex", ".bib", ".md", ".py") or
                   p.name in ("main.pdf", "provenance.json", "example-instance.json",
-                             "example-manifest.json", "example-result.json")) and p.name != "biblio-clean.bib"]
+                             "example-instance.manifest.json", "example-result.json")) and p.name != "biblio-clean.bib"]
     output = dict(status="passed", check_count=len(checks), checks=checks,
                   python=sys.version, artifacts={str(p.relative_to(ROOT)): sha(p) for p in sorted(artifacts)},
                   conformance_tests=dict(count=24, result="passed", evidence=tests_log.name,

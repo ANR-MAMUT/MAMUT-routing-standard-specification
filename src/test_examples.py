@@ -24,7 +24,7 @@ def digest(name):
 
 class WorkedExamples(unittest.TestCase):
     def envelope(self, prefix, profile, backend):
-        manifest_path = prefix + "-manifest.json"
+        manifest_path = prefix + "-instance.manifest.json"
         manifest = load(manifest_path)
         result = load(prefix + "-result.json")
         standard = result["metadata"]["standard"]
