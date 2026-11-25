@@ -27,4 +27,4 @@ The [static reference](src/reference.py) implements the exact and alternative st
 
 ## Licence
 
-The text of the specification (`main.tex`, `tex/`, `figures/` and the compiled PDF) is licensed under [CC BY 4.0](LICENSE).
+The text of the specification (`main.tex`, `tex/`, `figures/` and the compiled PDF) is licensed under [CC BY 4.0](LICENSE). The companion code under `src/` and the example files are licensed under the [MIT License](LICENSE-CODE).
