@@ -1,14 +1,14 @@
 \section{From a checked route to a stored result}\label{sec:results}
 
-Suppose two teams submit routes for the same instance. To decide whether either team has improved the Best-Known Solution (BKS), the curator needs the routes, the revision of the instance and its objective. Under both default profiles these suffice to recompute feasibility and the objective key. A submission can therefore consist of routes and an instance identity. A stored BKS records the outcome of checking that submission. It carries enough information for another reader to identify the same numerical problem, reproduce the result and compare a new candidate.
+Suppose two teams submit routes for the same instance. To decide whether either team has improved the Best-Known Solution (BKS), the curator needs the routes, the revision of the instance and its objective. Under both default profiles these suffice to recompute feasibility and the objective key, and a submission can therefore consist of routes and an instance identity. A stored BKS then records the outcome of checking that submission, with enough information for another reader to identify the same numerical problem, reproduce the result and compare a new candidate.
 
 \subsection{The exact value and its display}
 
-Consider the static example distributed with this specification. Its route visits customer 1, then customer 2, then returns to the depot. The three arc costs in the instance JSON are \id{0.1}, \id{0.2} and \id{0.3}. After binary64 interpretation the exact sum is
+Consider the static example distributed with this specification, whose route visits customer 1, then customer 2, and then returns to the depot. The three arc costs in the instance JSON are \id{0.1}, \id{0.2} and \id{0.3}, and after binary64 interpretation their exact sum is
 \[
  C=\frac{21617278211378381}{36028797018963968}.
 \]
-The nearest binary64 value has the round-trip spelling \id{0.6}. A reader who reconstructs a fraction from that binary64 value obtains a rational slightly smaller than $C$. A reader who interprets the spelling directly as decimal obtains $3/5$. To recover the actual cost, read the fraction or evaluate the three arcs under the declared profile. In \path{example-result.json} the top-level \id{cost} is \id{0.6}. Inside \id{metadata.standard} the same result has
+The nearest binary64 value has the round-trip spelling \id{0.6}. A reader who reconstructs a fraction from that binary64 value obtains a rational slightly smaller than $C$, whereas a reader who interprets the spelling directly as decimal obtains $3/5$. Neither reading gives the actual cost, which we recover by reading the fraction or by evaluating the three arcs under the declared profile. In \path{example-result.json}, the top-level \id{cost} is \id{0.6}, while inside \id{metadata.standard} the same result has
 \begin{verbatim}
 "authoritative_cost": {
   "numerator": "21617278211378381",
@@ -16,18 +16,18 @@ The nearest binary64 value has the round-trip spelling \id{0.6}. A reader who re
 }
 \end{verbatim}
 
-Both profiles encode an exact value $p/q$ in lowest terms with $q>0$. Write both integers as base-10 strings, without a leading plus, redundant leading zeros or negative zero. Encode zero as numerator \id{"0"} and denominator \id{"1"}. A reader \must{} reject a noncanonical fraction. Strings permit clients that read JSON numbers as binary64 to retain arbitrarily large integers without loss \autocite{brayJSON2017}.
+Both profiles encode an exact value $p/q$ in lowest terms with $q>0$ and write both integers as base-10 strings, without a leading plus, redundant leading zeros or negative zero. Encode zero as numerator \id{"0"} and denominator \id{"1"}. A reader \must{} reject a noncanonical fraction. We use strings because they permit clients that read JSON numbers as binary64 to retain arbitrarily large integers without loss \autocite{brayJSON2017}.
 
-For the top-level \id{cost}, round the exact total once to nearest binary64 with ties to even. Emit a finite projection as a round-trip JSON number, with positive zero. If that projection overflows, emit \id{cost:null}, set \id{display_overflow} to true and retain the exact fraction. A website showing $d$ decimal places instead rounds the exact total directly to the nearest point on $10^{-d}\mathbb{Z}$, again with ties to even. Converting to binary64 first and rounding again can produce a different last digit through \href{https://en.wikipedia.org/wiki/Rounding#Double_rounding}{double rounding}.
+For the top-level \id{cost}, round the exact total once to nearest binary64 with ties to even, and emit a finite projection as a round-trip JSON number, with positive zero. If that projection overflows, emit \id{cost:null}, set \id{display_overflow} to true and retain the exact fraction. A website showing $d$ decimal places instead rounds the exact total directly to the nearest point on $10^{-d}\mathbb{Z}$, again with ties to even. Converting to binary64 first and rounding again can produce a different last digit through \href{https://en.wikipedia.org/wiki/Rounding#Double_rounding}{double rounding}.
 
 \subsection{What the TD witness adds}
 
-In the companion TD instance the vehicle capacity is 1 and each of the two customers has demand 1. The solution uses the two routes \id{[1]} and \id{[2]}. On the first route the outward arc gives arrival $1+3t/2$ at departure $t$. Customer 1 opens at 6, needs 1 unit of service, and the return trip takes 1. Leaving before $10/3$ adds waiting. Leaving after $10/3$ increases elapsed duration because the outward arrival grows faster than the departure. At $10/3$ the vehicle reaches the customer exactly at opening, returns at 8 and spends $14/3$ time units away from the depot. On the second route any departure in $[5,7]$ attains duration 6. The earliest is 5. With a fixed charge of $5/4$ per vehicle, \id{FleetCostDuration} gives
+In the companion TD instance the vehicle capacity is 1 and each of the two customers has demand 1, so the solution uses the two routes \id{[1]} and \id{[2]}. On the first route, the outward arc gives arrival $1+3t/2$ at departure $t$, customer 1 opens at 6 and needs 1 unit of service, and the return trip takes 1. Leaving before $10/3$ adds waiting, whereas leaving after $10/3$ increases elapsed duration because the outward arrival grows faster than the departure. At $10/3$ the vehicle reaches the customer exactly at opening, returns at 8 and spends $14/3$ time units away from the depot. On the second route, any departure in $[5,7]$ attains duration 6 and the earliest of them is 5. With a fixed charge of $5/4$ per vehicle, \id{FleetCostDuration} therefore gives
 \[
  C=\frac{14}{3}+6+2\left(\frac54\right)=\frac{79}{6}.
 \]
 
-A TD BKS \must{} store \id{metadata.standard.route_evaluations} in the same order as its stored \id{routes}. Every entry contains both the exact \id{duration} and the exact earliest \id{departure_time}. For the two routes above the array is
+A TD BKS \must{} store \id{metadata.standard.route_evaluations} in the same order as its stored \id{routes}. Every entry contains both the exact \id{duration} and the exact earliest \id{departure_time}, as in the following array for the two routes above.
 \begin{verbatim}
 [
   {"duration":       {"numerator":"14", "denominator":"3"},
@@ -36,11 +36,11 @@ A TD BKS \must{} store \id{metadata.standard.route_evaluations} in the same orde
    "departure_time": {"numerator":"5",  "denominator":"1"}}
 ]
 \end{verbatim}
-Replaying the first departure checks that the vehicle attains $14/3$. Independently minimizing the duration also checks that this value is optimal and that no earlier feasible departure attains it. A displayed departure may be rounded to binary64 for a user interface. A client that replays a schedule uses the exact fraction.
+Replaying the first departure checks that the vehicle attains $14/3$, while independently minimizing the duration also checks that this value is optimal and that no earlier feasible departure attains it. A displayed departure may be rounded to binary64 for a user interface, but a client that replays a schedule uses the exact fraction.
 
 \subsection{Record identity and compare like with like}
 
-In both examples, \id{routes} holds the customer sequences in lexicographic order, with depot endpoints implicit. Preserve customer order within a route. Sort routes and their associated TD evaluations together. Table~\ref{tab:result-identity} describes the contents of \id{metadata.standard}. The complete files \path{example-result.json} and \path{example-td-result.json} include real hashes of their companion manifests and of the checkers used to produce them.
+In both examples, \id{routes} holds the customer sequences in lexicographic order, with depot endpoints implicit. Preserve customer order within a route, and sort routes and their associated TD evaluations together. Table~\ref{tab:result-identity} describes the contents of \id{metadata.standard}, and the complete files \path{example-result.json} and \path{example-td-result.json} include real hashes of their companion manifests and of the checkers used to produce them.
 
 \begin{table}[htbp]
 \centering\small
@@ -62,8 +62,8 @@ Field & What a reader verifies\\
 \caption{Fields shared by the static and TD results, with the additional route witnesses required for TD.}\label{tab:result-identity}
 \end{table}
 
-To reproduce \id{routes_sha256}, hash an ASCII stream beginning with \id{MAMUT-ROUTES-v1} and a line feed (LF), then the route count and LF. For each stored route write its customer count, a colon, its comma-separated customer indices and LF. Use base-10 integers without leading zeros. For the static example the three successive lines are \id{MAMUT-ROUTES-v1}, \id{1} and \id{2:1,2}, including the final LF.
+To reproduce \id{routes_sha256}, hash an ASCII stream beginning with \id{MAMUT-ROUTES-v1} and a line feed (LF), followed by the route count and LF. Each stored route then contributes its customer count, a colon, its comma-separated customer indices and LF. Use base-10 integers without leading zeros. For the static example, the three successive lines are \id{MAMUT-ROUTES-v1}, \id{1} and \id{2:1,2}, including the final LF.
 
-A supplied cost or schedule is an assertion. Recompute the exact values and reject an inconsistent result, including a feasible TD witness that is later than the earliest minimizing departure. Compare incumbents only within the same benchmark revision, interpreted inputs, objective and profile. For a hierarchical objective compare vehicle counts before travel costs. Replace the stored incumbent only on a strict improvement of the complete exact key. For example, scalar costs $1$ and $1+2^{-54}$ both display as binary64~1. The first is strictly smaller. If the exact keys agree, retain the incumbent already in the store.
+Since a supplied cost or schedule is an assertion, recompute the exact values and reject an inconsistent result, including a feasible TD witness that is later than the earliest minimizing departure. Compare incumbents only within the same benchmark revision, interpreted inputs, objective and profile, and for a hierarchical objective compare vehicle counts before travel costs. Replace the stored incumbent only on a strict improvement of the complete exact key. For example, scalar costs $1$ and $1+2^{-54}$ both display as binary64~1, yet the first is strictly smaller. If the exact keys agree, retain the incumbent already in the store.
 
-The backend record lets another team repeat the evaluation in the same implementation or check it independently. Python \id{Fraction} supplies a selectable reference for each profile. The v0.13 native defaults use prepared C++ dyadic arithmetic for static evaluation and C++ prefix composition with the GNU Multiple Precision Arithmetic Library (GMP) for TD. Appendix~\ref{app:implementation-guide} explains how the algorithms obtain equal exact outputs despite their different representations of numbers and schedules.
+The backend record lets another team repeat the evaluation in the same implementation or check it independently. Python \id{Fraction} supplies a selectable reference for each profile, whereas the v0.13 native defaults use prepared C++ dyadic arithmetic for static evaluation and C++ prefix composition with the GNU Multiple Precision Arithmetic Library (GMP) for TD. Appendix~\ref{app:implementation-guide} explains how the algorithms obtain equal exact outputs despite their different representations of numbers and schedules.
