@@ -51,13 +51,13 @@
 \small \textsuperscript{1}Université Bretagne Sud, Lab-STICC, France\\
 \small \textsuperscript{2}IMT Atlantique, Lab-STICC, France\\
 \small \textsuperscript{3}INSA Lyon, Inria, CITI, France}
-\date{Draft Version 0.1.\the\year\ifnum\month<10 0\fi\the\month\ifnum\day<10 0\fi\the\day}
+\date{Version 0.1, \today}
 \hypersetup{pdftitle={MAMUT-routing Standard Specification for Static and Time-Dependent Routing},pdfauthor={Adrien Pichon, Florian Rascoussier, Romain Billot, Lina Fahed, Alexandru-Liviu Olteanu, Marc Sevaux, Christine Solnon}}
 \begin{document}
 \begin{singlespace}
 \maketitle
 \begin{abstract}
-We specify how a MAMUT-routing benchmark revision assigns numerical meaning to an instance, a route and its reported cost. The instance manifest binds the source artifacts by hash, so that a reader can either load the published arc data or reproduce them with pinned code and compare their complete binary64 digest. Once these operands are fixed, both readers can evaluate the submitted routes exactly. Static benchmarks use a cost matrix, whereas time-dependent benchmarks use arrival-time functions and optimize the departure of each route. In both settings, we compare incumbents using the exact objective and derive the displayed values from it. We give the shared contracts, the evaluation rules specific to each setting and worked examples of their consequences.
+We specify how a MAMUT-routing benchmark edition assigns numerical meaning to an instance, a route and its reported cost. The instance manifest binds the source artifacts by hash, so that a reader can either load the published arc data or reproduce them with pinned code and compare their complete binary64 digest. Once these operands are fixed, both readers can evaluate the submitted routes exactly. Static benchmarks use a cost matrix, whereas time-dependent benchmarks use arrival-time functions and optimize the departure of each route. In both settings, we compare incumbents using the exact objective and derive the displayed values from it. We give the shared contracts, the evaluation rules specific to each setting and worked examples of their consequences.
 \end{abstract}
 
 \begin{center}
@@ -99,7 +99,15 @@ Christine Solnon & \href{https://orcid.org/0000-0002-0919-496X}{0000-0002-0919-4
 \clearpage
 \input{tex/td-attainment}
 \clearpage
+\input{tex/td-jump}
+\clearpage
 \input{tex/solver-claim}
 \clearpage
 \input{tex/certification-order}
+\clearpage
+\phantomsection
+\section*{Licence and AI-use statement}\addcontentsline{toc}{section}{Licence and AI-use statement}
+This document is distributed under the \href{https://creativecommons.org/licenses/by/4.0/}{Creative Commons Attribution 4.0 International licence (CC BY 4.0)}.
+
+AI assistants were used for source inspection, for drafting and checking the text and for preparing the companion code, under the supervision of the authors. The authors reviewed the content and are responsible for it.
 \end{document}

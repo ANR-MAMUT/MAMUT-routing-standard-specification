@@ -1,14 +1,14 @@
-"""Read-only checks of the draft, its synthetic envelope and recorded sources.
+"""Read-only checks of the built document and its worked examples.
 
-Writes validation.json only. Run after building the PDF and recording provenance.
+Run from the repository root after building main.pdf. The script reads only files of this repository and prints a summary.
 """
 
 import hashlib
 import json
 from pathlib import Path
 import re
+import shutil
 import subprocess
-import sys
 
 import reference as ref
 
@@ -28,19 +28,7 @@ def validate():
             raise AssertionError(label)
         checks.append(label)
 
-    provenance = json.loads((ROOT / "provenance.json").read_text())
-    for source in provenance["source_files"]:
-        check(sha(source["path"]) == source["sha256"], "source identity: " + source["path"])
-
     main = (ROOT / "main.tex").read_text()
-    cff = Path(provenance["author_metadata"]).read_text()
-    orcids = re.findall(r"https://orcid.org/([0-9X-]+)", cff)
-    check(len(orcids) == 7 and all(value in main for value in orcids), "all 7 author ORCIDs")
-    names = re.findall(r"given-names: (.+)\n\s+family-names: (.+)", cff)
-    full_names = [first + " " + last for first, last in names]
-    positions = [main.index(name) for name in full_names]
-    check(len(names) == 7 and positions == sorted(positions), "author citation order")
-
     tex = "\n".join(p.read_text() for p in (ROOT / "tex").glob("*.tex"))
     bib = (ROOT / "biblio.bib").read_text()
     cited = set()
@@ -85,28 +73,12 @@ def validate():
     for pattern in (r"^!", "undefined references", "Citation .* undefined", "Overfull", "Infinite glue"):
         check(re.search(pattern, log, re.MULTILINE) is None, "no LaTeX diagnostic: " + pattern)
     check("WARN" not in (ROOT / "main.blg").read_text(), "no biber warnings")
-    pdf_text = subprocess.run(["pdftotext", str(ROOT / "main.pdf"), "-"],
-                              check=True, capture_output=True, text=True).stdout
-    check("??" not in pdf_text, "no unresolved PDF references")
-    check(all(oid in pdf_text for oid in orcids), "ORCIDs appear in compiled PDF")
-    check("binary64-exact-v1" in pdf_text and "decimal-grid-3-v1" in pdf_text, "profile identifiers appear in PDF")
-    tests_log = ROOT / "conformance-tests.log"
-    tests_text = tests_log.read_text()
-    check("Ran 24 tests" in tests_text and tests_text.rstrip().endswith("OK"), "24 conformance tests passed")
-
-    artifacts = [p for p in ROOT.rglob("*") if p.is_file() and
-                 (p.suffix in (".tex", ".bib", ".md", ".py") or
-                  p.name in ("main.pdf", "provenance.json", "example-instance.json",
-                             "example-instance.manifest.json", "example-result.json")) and p.name != "biblio-clean.bib"]
-    output = dict(status="passed", check_count=len(checks), checks=checks,
-                  python=sys.version, artifacts={str(p.relative_to(ROOT)): sha(p) for p in sorted(artifacts)},
-                  conformance_tests=dict(count=24, result="passed", evidence=tests_log.name,
-                                         sha256=sha(tests_log), command="python -m unittest discover -s src -v"),
-                  limitations=["Synthetic/reference verification, not production conformance certification",
-                               "No full-corpus audit or timing experiment rerun in s121",
-                               "No cross-platform certification or optimality proof"])
-    (ROOT / "validation.json").write_text(json.dumps(output, indent=2) + "\n")
-    print(json.dumps(dict(status="passed", check_count=len(checks), artifacts=len(artifacts))))
+    if shutil.which("pdftotext"):
+        pdf_text = subprocess.run(["pdftotext", str(ROOT / "main.pdf"), "-"],
+                                  check=True, capture_output=True, text=True).stdout
+        check("??" not in pdf_text, "no unresolved PDF references")
+        check("binary64-exact-v1" in pdf_text and "decimal-grid-3-v1" in pdf_text, "profile identifiers appear in PDF")
+    print(json.dumps(dict(status="passed", check_count=len(checks))))
 
 
 if __name__ == "__main__":

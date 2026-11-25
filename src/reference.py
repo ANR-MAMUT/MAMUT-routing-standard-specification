@@ -1,4 +1,4 @@
-"""Executable reference kernels for MAMUT-routing standard draft 0.1.
+"""Executable reference kernels for MAMUT-routing standard version 0.1.
 
 This is a specification companion, not a production loader or library patch.
 Input is the normalized, materialized static instance described in the document.

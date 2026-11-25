@@ -1,5 +1,5 @@
 {
-  "specification": "mamut-routing/0.1-review",
+  "specification": "mamut-routing/0.1",
   "family": "SyntheticExample",
   "benchmark_revision": "r1",
   "instance_name": "two-singleton-routes",

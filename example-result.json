@@ -8,9 +8,9 @@
   "cost": 0.6,
   "metadata": {
     "standard": {
-      "specification": "mamut-routing/0.1-review",
+      "specification": "mamut-routing/0.1",
       "benchmark_revision": "r1",
-      "manifest_sha256": "cb6b60ba2f267b225751d391f78902a72765b3913a31a3db18beb748094ed5cf",
+      "manifest_sha256": "62c3f1d4c85454eab23e376ef66524183bc5ac3ff886152d644ef68d0c25ad11",
       "profile": "binary64-exact-v1",
       "objective": "MonoCost",
       "num_routes": 1,
@@ -22,7 +22,7 @@
       "evaluation": {
         "checker": "src/reference.py",
         "backend": "python-fraction",
-        "source_sha256": "223c7a1a01cbbc22653d14c7c4e41457221009ef6ba971366b49f250df7910da",
+        "source_sha256": "019673569519fbf89f55c263b99dd8c60d6ed43cd739b38a714dd514f8e61224",
         "runtime": {
           "python": "3.13.13 (main, Apr  7 2026, 18:19:01) [GCC 15.2.0]",
           "platform": "Linux-6.18.63-x86_64-with-glibc2.42"

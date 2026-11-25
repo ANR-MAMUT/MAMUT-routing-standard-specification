@@ -12,7 +12,7 @@ import td_example
 
 
 ROOT = Path(__file__).resolve().parent.parent
-SPECIFICATION = "mamut-routing/0.1-review"
+SPECIFICATION = "mamut-routing/0.1"
 
 
 def sha(path):

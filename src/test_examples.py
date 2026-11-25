@@ -28,7 +28,7 @@ class WorkedExamples(unittest.TestCase):
         manifest = load(manifest_path)
         result = load(prefix + "-result.json")
         standard = result["metadata"]["standard"]
-        self.assertEqual(manifest["specification"], "mamut-routing/0.1-review")
+        self.assertEqual(manifest["specification"], "mamut-routing/0.1")
         self.assertEqual(standard["specification"], manifest["specification"])
         self.assertEqual(standard["manifest_sha256"], digest(manifest_path))
         for artifact in [manifest["instance"], *manifest["sidecars"]]:

@@ -1,6 +1,6 @@
 \section{From a checked route to a stored result}\label{sec:results}
 
-Suppose two teams submit routes for the same instance. To decide whether either team has improved the Best-Known Solution (BKS), the curator needs the routes, the revision of the instance and its objective. Under both default profiles these suffice to recompute feasibility and the objective key, and a submission can therefore consist of routes and an instance identity. A stored BKS then records the outcome of checking that submission, with enough information for another reader to identify the same numerical problem, reproduce the result and compare a new candidate.
+Suppose two teams submit routes for the same instance. To decide whether either team has improved the Best-Known Solution (BKS), the curator needs the routes, the edition of the instance and its objective. Under both default profiles these suffice to recompute feasibility and the objective key, and a submission can therefore consist of routes and an instance identity. A stored BKS then records the outcome of checking that submission, with enough information for another reader to identify the same numerical problem, reproduce the result and compare a new candidate.
 
 \subsection{The exact value and its display}
 
@@ -48,10 +48,10 @@ In both examples, \id{routes} holds the customer sequences in lexicographic orde
 \toprule
 Field & What a reader verifies\\
 \midrule
-\id{specification} & The specification revision used to produce the result.\\
-\id{benchmark_revision} & The published edition label of this instance variant within its family.\\
+\id{specification} & The specification version used to produce the result, here \id{mamut-routing/0.1}.\\
+\id{benchmark_revision} & The edition label of this instance variant within its family, for instance \id{r1}. The field keeps its historical name and holds this label.\\
 \id{manifest_sha256} & SHA-256 of the complete manifest file bytes. The manifest binds the descriptor and the materialized arc data.\\
-\id{profile}, \id{objective} & The arithmetic contract and the mathematical objective declared for this revision.\\
+\id{profile}, \id{objective} & The arithmetic contract and the mathematical objective declared for this edition.\\
 \id{num_routes}, \id{routes_sha256} & The number of vehicles used and the digest of the canonical customer sequences.\\
 \id{authoritative_cost} & The reduced fraction giving the exact scalar cost component.\\
 \id{display_overflow} & True exactly when binary64 projection of the total overflows.\\
@@ -64,6 +64,27 @@ Field & What a reader verifies\\
 
 To reproduce \id{routes_sha256}, hash an ASCII stream beginning with \id{MAMUT-ROUTES-v1} and a line feed (LF), followed by the route count and LF. Each stored route then contributes its customer count, a colon, its comma-separated customer indices and LF. Use base-10 integers without leading zeros. For the static example, the three successive lines are \id{MAMUT-ROUTES-v1}, \id{1} and \id{2:1,2}, including the final LF.
 
-Since a supplied cost or schedule is an assertion, recompute the exact values and reject an inconsistent result, including a feasible TD witness that is later than the earliest minimizing departure. Compare incumbents only within the same benchmark revision, interpreted inputs, objective and profile, and for a hierarchical objective compare vehicle counts before travel costs. Replace the stored incumbent only on a strict improvement of the complete exact key. For example, scalar costs $1$ and $1+2^{-54}$ both display as binary64~1, yet the first is strictly smaller. If the exact keys agree, retain the incumbent already in the store.
+Since a supplied cost or schedule is an assertion, recompute the exact values and reject an inconsistent result, including a feasible TD witness that is later than the earliest minimizing departure.
 
-The backend record lets another team repeat the evaluation in the same implementation or check it independently. Python \id{Fraction} supplies a selectable reference for each profile, whereas the v0.13 native defaults use prepared C++ dyadic arithmetic for static evaluation and C++ prefix composition with the GNU Multiple Precision Arithmetic Library (GMP) for TD. Appendix~\ref{app:implementation-guide} explains how the algorithms obtain equal exact outputs despite their different representations of numbers and schedules.
+The backend record lets another team repeat the evaluation in the same implementation or check it independently. Python \id{Fraction} supplies a selectable reference for each profile, whereas the native defaults of the library use prepared C++ dyadic arithmetic for static evaluation and C++ prefix composition with the GNU Multiple Precision Arithmetic Library (GMP) for TD. Appendix~\ref{app:implementation-guide} explains how the algorithms obtain equal exact outputs despite their different representations of numbers and schedules.
+
+\subsection{Rank a candidate against the incumbent}
+
+Each objective ranks solutions by an exact comparison key, which Table~\ref{tab:objectives} gives together with the definitions of Section~\ref{sec:td-core}, the unit of the cost and the families whose manifests declare it. Keys are compared lexicographically, so the hierarchical objective compares vehicle counts before travel costs, whereas \id{FleetCostDuration} already prices each vehicle in its scalar cost and thus has a single component. An incumbent is replaced only when the candidate strictly improves the complete exact key, and on equality the incumbent already in the store is kept. For example, scalar costs $1$ and $1+2^{-54}$ both display as binary64~1, yet the first is strictly smaller.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Objective & Minimized key & Unit of cost & Problem types and families\\
+\midrule
+\id{MonoCost} & $\bigl(C(\mathcal S)\bigr)$ & arc-cost unit & CVRP of Mamut2026 and Poryos2026 (metre or second), VRPTW of Dimacs2021 (one tenth of the Solomon unit), Ortec2022 and Poryos2026 (second)\\
+\id{HierarchicalVehicleCost} & $\bigl(|\mathcal S|,C(\mathcal S)\bigr)$ & vehicles, then arc-cost unit & VRPTW of Sintef2008 (Solomon unit)\\
+\id{Duration} & $\bigl(\sum_{\mathbf r\in\mathcal S}\Delta_{\mathbf r}^*\bigr)$ & time unit & TDVRP and TDVRPTW of Ari2018, Dabia2013, Lera2026, Vu2020 (unit of the original benchmark), Poryos2026 and Rifki2020 (second)\\
+\id{FleetCostDuration} & $\bigl(F|\mathcal S|+\sum_{\mathbf r\in\mathcal S}\Delta_{\mathbf r}^*\bigr)$ & time unit, with $F$ in the same unit & TDVRPTW of Blauth2024 (millisecond)\\
+\bottomrule
+\end{tabularx}
+\caption{Objectives and their exact comparison keys. Here $C(\mathcal S)$ is the exact sum of the traversed arc costs, $\Delta_{\mathbf r}^*$ the minimum duration of route $\mathbf r$ and $F$ the fixed charge per used vehicle. The last column lists the families whose edition manifests declare the objective, with the cost unit they declare.}\label{tab:objectives}
+\end{table}
+
+Compare a candidate with the incumbent only within the same benchmark edition, interpreted inputs, objective and profile. A stored cost, like a submitted one, is an assertion, so both route sets \must{} be re-evaluated under the profile of the family before their keys are compared. If the stored incumbent turns out to be infeasible under that profile, the publisher considers the earlier route sets recorded for the same inputs and objective, and the best feasible one takes its place in the comparison. If none of them is feasible, the instance has no best-known solution for that objective until a feasible candidate is checked.

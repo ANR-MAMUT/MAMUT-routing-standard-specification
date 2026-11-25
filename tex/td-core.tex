@@ -9,7 +9,7 @@ Let $y^-(x)$ and $y^+(x)$ be the first and last ordinates stored at a distinct a
  \alpha_{ij}(t)=y^+(x)+\frac{t-x}{x'-x}\bigl(y^-(x')-y^+(x)\bigr).
 \end{equation}
 
-When several knots have the same abscissa, the lower ordinate is attained at that instant, and if another piece follows, it starts from the upper ordinate on the right. This distinction matters for a vehicle that can meet a deadline by leaving exactly at the jump. Each departure onto an arc, including the return leg, must lie in $[h_0,h_1]$, but its arrival may exceed $h_1$ on the final leg if the depot deadline permits it or if no deadline applies.
+When several knots have the same abscissa, the lower ordinate is attained at that instant, and if another piece follows, it starts from the upper ordinate on the right. This distinction matters for a vehicle that can meet a deadline by leaving exactly at the jump, and Appendix~\ref{app:td-jump} works through such a departure on a published instance. Each departure onto an arc, including the return leg, must lie in $[h_0,h_1]$, but its arrival may exceed $h_1$ on the final leg if the depot deadline permits it or if no deadline applies.
 
 \paragraph{Minimum elapsed time.}
 
@@ -29,7 +29,7 @@ For the one-customer route above, take $[h_0,h_1]=[0,15]$ and give each leg the 
 
 A solution receives an authoritative cost only when all its routes are feasible. The benchmark manifest declares which objective to minimize. For a static route $\mathbf r$, let $c_{\mathbf r}=\sum_{j=1}^{m-1}c_{v_j v_{j+1}}$, including both depot legs. With $C(\mathcal S)=\sum_{\mathbf r\in\mathcal S}c_{\mathbf r}$, \id{MonoCost} minimizes $C(\mathcal S)$, whereas \id{HierarchicalVehicleCost} minimizes the pair $(|\mathcal S|,C(\mathcal S))$ lexicographically. Under the latter objective, any feasible solution using fewer vehicles ranks first, whatever its travel cost.
 
-Because the vehicles of a TD solution choose their departures independently, the objective \id{Duration} sums the exact minima $\sum_{\mathbf r\in\mathcal S}\Delta_{\mathbf r}^*$. For \id{FleetCostDuration} the instance also supplies a nonnegative fixed charge $F$ per used vehicle, in the same units as duration, and the scalar objective becomes $F|\mathcal S|+\sum_{\mathbf r\in\mathcal S}\Delta_{\mathbf r}^*$. In both cases the elapsed duration includes travel, customer service and waiting away from the depot. Since all four objectives use exact sums, route enumeration has no effect on their values. Section~\ref{sec:results} specifies how to store and compare the resulting exact keys.
+Because the vehicles of a TD solution choose their departures independently, the objective \id{Duration} sums the exact minima $\sum_{\mathbf r\in\mathcal S}\Delta_{\mathbf r}^*$. For \id{FleetCostDuration} the instance also supplies a nonnegative fixed charge $F$ per used vehicle, in the same units as duration, and the scalar objective becomes $F|\mathcal S|+\sum_{\mathbf r\in\mathcal S}\Delta_{\mathbf r}^*$. In both cases the elapsed duration includes travel, customer service and waiting away from the depot. Since all four objectives use exact sums, route enumeration has no effect on their values. Section~\ref{sec:results} specifies how to store and compare the resulting exact keys, and Table~\ref{tab:objectives} summarizes the 4 objectives.
 
 \paragraph{When a displayed departure misses the deadline.}
 

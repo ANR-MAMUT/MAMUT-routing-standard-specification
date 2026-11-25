@@ -1,4 +1,4 @@
-"""Boundary and independently specified conformance fixtures for draft 0.1."""
+"""Boundary and independently specified conformance fixtures for version 0.1."""
 
 from fractions import Fraction as Q
 import itertools

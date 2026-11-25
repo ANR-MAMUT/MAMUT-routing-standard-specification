@@ -1,28 +1,28 @@
 \section{Mathematical notation and arithmetic domains}\label{app:notation}
 This appendix defines the number sets, operators and routing symbols used in the prose and pseudocode. Its definitions distinguish the numerical value of an operand from the arithmetic representation used to evaluate it, and domain annotations such as $f\in\Fbin$ and $x\in\Q$ make that choice explicit without prescribing a particular software type.
 
-For routing objects, sets use calligraphic capitals and ordered vectors use bold lowercase letters. For example, $\mathcal{V}$ and $\mathcal{C}$ are the vertex and customer sets, $\mathcal{S}$ is a solution set, and $\mathbf{r}$ is a route vector. Angle brackets denote ordered vertex sequences and arcs. The ordered route enumeration $\mathbf{s}$ records how a solution is submitted, which matters for an order-sensitive evaluator. Both endpoints of $\mathbf{r}$ use the stored depot index 0, whereas the JSON route arrays encode only $\mathbf{r}_{\mathcal{C}}$. The numerical domains, parser operators and local arithmetic variables defined in this appendix remain specific to this specification.
+For routing objects, sets use calligraphic capitals and ordered vectors use bold lowercase letters. For example, $\mathcal{V}$ and $\mathcal{C}$ are the vertex and customer sets, $\mathcal{S}$ is a solution set, and $\mathbf{r}$ is a route vector. Angle brackets denote ordered vertex sequences and arcs. The ordered route enumeration $\mathbf{s}$ records how a solution is submitted, which matters for an order-sensitive evaluator. Both endpoints of $\mathbf{r}$ use the stored depot index 0, whereas the JSON route arrays encode only $\mathbf{r}_{\mathcal{C}}$. The symbols for vertex and customer sets, routes and solutions, demands and capacity, fleet limit, time windows, service durations, arc costs, arrival functions and route durations follow the routing notation that we share with our other work on these problems. By contrast, the depot index 0, the departure horizon $[h_0,h_1]$, the enumeration $\mathbf{s}$, the schedule and cost symbols $u_j$, $d_j$, $C$ and $F$, the number sets, the parsing and rounding operators, and the variables local to an algorithm or to Appendix~\ref{app:implementation-guide} belong to this document alone.
 
 \subsection{Number sets and their relationships}
 We use $\mathbb{N}_0=\{0,1,2,\ldots\}$, $\mathbb{Z}$, $\Q=\{p/q:p\in\mathbb{Z},\ q\in\mathbb{Z}_{>0}\}$ and $\mathbb{R}$ for nonnegative integers, integers, rationals and reals, respectively. For a number set $X$, the notation $X_{\geq0}=\{x\in X:x\geq0\}$ and $X_{>0}=\{x\in X:x>0\}$ restricts its sign. We further define
 \begin{align}
-\Dyadic&=\{m2^{-b}:m\in\mathbb{Z},\ b\in\mathbb{N}_0\},\\
-\DecimalSet&=\{m10^{-d}:m\in\mathbb{Z},\ d\in\mathbb{N}_0\},\\
-\Grid{d}&=10^{-d}\mathbb{Z}=\{m10^{-d}:m\in\mathbb{Z}\},\qquad d\in\mathbb{N}_0.
+\Dyadic&=\{\mu2^{-b}:\mu\in\mathbb{Z},\ b\in\mathbb{N}_0\},\\
+\DecimalSet&=\{\mu10^{-d}:\mu\in\mathbb{Z},\ d\in\mathbb{N}_0\},\\
+\Grid{d}&=10^{-d}\mathbb{Z}=\{\mu10^{-d}:\mu\in\mathbb{Z}\},\qquad d\in\mathbb{N}_0.
 \end{align}
 Thus $\Dyadic$ contains every dyadic rational, $\DecimalSet$ contains every rational with a finite decimal expansion, and $\Grid{d}$ fixes one decimal grid. For example, $215359/1000\in\Grid{3}$, while the binary64 value read from \id{215.359} lies outside that grid.
 
-The \href{https://en.wikipedia.org/wiki/IEEE_754}{IEEE 754} standard defines \href{https://en.wikipedia.org/wiki/Double-precision_floating-point_format}{binary64}, a double-precision binary floating-point format whose values occupy 64 bits, with 1 sign bit, 11 exponent bits and 52 explicit fraction bits. For a normal finite value, let $s\in\{0,1\}$ be its sign bit, $E\in\{1,\ldots,2046\}$ its exponent field and $F\in\{0,\ldots,2^{52}-1\}$ its fraction field. Its exact numerical value is
+The \href{https://en.wikipedia.org/wiki/IEEE_754}{IEEE 754} standard defines \href{https://en.wikipedia.org/wiki/Double-precision_floating-point_format}{binary64}, a double-precision binary floating-point format whose values occupy 64 bits, with 1 sign bit, 11 exponent bits and 52 explicit fraction bits. For a normal finite value, let $\sigma\in\{0,1\}$ be its sign bit, $E\in\{1,\ldots,2046\}$ its exponent field and $T\in\{0,\ldots,2^{52}-1\}$ its fraction field, which IEEE 754 calls the trailing significand field. Its exact numerical value is
 \begin{equation}\label{eq:binary64-normal}
-(-1)^s(1+F2^{-52})2^{E-1023},\qquad 1\leq E\leq2046.
+(-1)^{\sigma}(1+T2^{-52})2^{E-1023},\qquad 1\leq E\leq2046.
 \end{equation}
-For $E=0$, the finite value is $(-1)^s F2^{-1074}$, which covers \href{https://en.wikipedia.org/wiki/Subnormal_number}{subnormal numbers} and signed zero, while the all-ones exponent encodes infinities and NaNs. The normal \href{https://en.wikipedia.org/wiki/Significand}{significand} has 53 bits of precision \autocite{oracleIEEEArithmetic}.
+For $E=0$, the finite value is $(-1)^{\sigma}T2^{-1074}$, which covers \href{https://en.wikipedia.org/wiki/Subnormal_number}{subnormal numbers} and signed zero, while the all-ones exponent encodes infinities and NaNs. The normal \href{https://en.wikipedia.org/wiki/Significand}{significand} has 53 bits of precision \autocite{oracleIEEEArithmetic}.
 
 The finite binary64 numerical values form the set
 \begin{align}
 \Fbin={}&\{0\}\nonumber\\
-&\cup\{\pm m2^{-1074}:m\in\mathbb{Z},\ 1\leq m<2^{52}\}\nonumber\\
-&\cup\{\pm(2^{52}+m)2^{h-52}:m\in\{0,\ldots,2^{52}-1\},\ h\in\{-1022,\ldots,1023\}\}.
+&\cup\{\pm\mu2^{-1074}:\mu\in\mathbb{Z},\ 1\leq\mu<2^{52}\}\nonumber\\
+&\cup\{\pm\mu2^{\eta}:\mu\in\mathbb{Z},\ 2^{52}\leq\mu<2^{53},\ \eta\in\{-1074,\ldots,971\}\}.
 \end{align}
 The second set gives the nonzero subnormal values and the third gives the normal values. Since this is a set of numerical values, positive and negative zero both denote its element 0. NaNs and infinities are excluded. The domains satisfy
 \begin{equation}
@@ -46,7 +46,7 @@ The rounding operator $\RoundBinary:\mathbb{R}\to\FbinExt$, with $\FbinExt=\Fbin
 For $d\in\mathbb{N}_0$, decimal quantization is $Q_d:\mathbb{R}\to\Grid{d}$, defined by $Q_d(x)=10^{-d}\operatorname{roundEven}(10^d x)$, where $\operatorname{roundEven}:\mathbb{R}\to\mathbb{Z}$ selects the nearest integer with ties to even. Algorithm~\ref{alg:quantize} evaluates this map for $x\in\Q$ using integer arithmetic. Note that the symbols $Q_d$, $\Q$ and the vehicle capacity $Q$ denote a quantization function, a number set and an integer resource bound, respectively.
 
 \subsection{Symbols and notation}
-The table below collects the main symbols, including quantities local to an algorithm, where a reused letter is distinguished by its indices and stated context. We write $\bot$ for an absent mathematical value, corresponding to null in the relevant JSON field. The symbol $\gets$ denotes assignment, $\in$ membership, $\subseteq$ inclusion and $\subsetneq$ proper inclusion.
+The table below collects the main symbols, including the quantities local to an algorithm or to Appendix~\ref{app:implementation-guide}. We write $\bot$ for an absent mathematical value, corresponding to null in the relevant JSON field. The symbol $\gets$ denotes assignment, $\in$ membership, $\subseteq$ inclusion and $\subsetneq$ proper inclusion.
 
 \begingroup
 \small
@@ -68,8 +68,9 @@ $\Dyadic,\DecimalSet$ & Dyadic rationals and finite-decimal rationals, respectiv
 $\Grid{d}$ & Decimal grid $10^{-d}\mathbb{Z}$ for $d\in\mathbb{N}_0$.\\
 $\Fbin,\FbinExt$ & Finite binary64 numerical values, and those values extended with infinities. NaNs are in neither set.\\
 $\FbinNonneg$ & Nonnegative finite binary64 values, $\Fbin\cap\mathbb{R}_{\geq0}$.\\
-$s,E,F$ & Binary64 sign bit, biased exponent field and fraction field in Equation~\ref{eq:binary64-normal}. These are distinct from customer service durations $s_i$.\\
-$h$ & Unbiased normal exponent $h=E-1023\in\{-1022,\ldots,1023\}$ in the set definition of $\Fbin$.\\
+$\sigma,E,T$ & Binary64 sign bit, biased exponent field and fraction field in Equation~\ref{eq:binary64-normal}.\\
+$\mu,\eta$ & Integer coefficient $\mu\in\mathbb{Z}$ and binary exponent $\eta\in\mathbb{Z}$, as in $f=\mu2^{\eta}$ for a nonzero $f\in\Fbin$. In set definitions, $\mu$ is the integer coefficient of a power of 2 or 10.\\
+$\nu,\mu',\eta'$ & Number $\nu$ of trailing zero bits of a positive $\mu$, odd coefficient $\mu'=\mu/2^{\nu}$ and exponent $\eta'=\eta+\nu$, so that $f=\mu'2^{\eta'}$.\\
 $\JsonNum,\ t$ & Valid JSON numerical tokens and an individual token $t\in\JsonNum$.\\
 $\Dec$ & Exact decimal parser $\JsonNum\to\DecimalSet$.\\
 $f,x$ & A binary64 operand $f\in\Fbin$ and an exact rational operand $x\in\Q$, with the chosen interpretation specified.\\
@@ -77,7 +78,7 @@ $\RatBin$ & Inclusion $\Fbin\hookrightarrow\Q$ preserving the exact numerical va
 $\RoundBinary$ & Binary64 nearest-even rounding $\mathbb{R}\to\FbinExt$, with overflow checked before acceptance.\\
 $+,\ \oplus_{64}$ & Exact addition and addition followed by binary64 rounding, respectively.\\
 $Q_d,\operatorname{roundEven}$ & Decimal quantization to $\Grid{d}$ and nearest-even rounding to $\mathbb{Z}$.\\
-$P$ & Numerical evaluation profile of the benchmark revision.\\
+$P$ & Numerical evaluation profile of the benchmark edition.\\
 $I$ & Materialized instance, including the applicable matrix or arc functions and the remaining problem data.\\
 $\mathcal{V},\mathcal{C},n$ & Vertices $\mathcal{V}=\mathcal{C}\cup\{0\}$, customers $\mathcal{C}=\{1,\ldots,n\}$ and customer count $n=|\mathcal{C}|\in\mathbb{N}_0$. Vertex 0 is the depot.\\
 $q_i,Q$ & Demand and vehicle capacity in $\mathbb{N}_0\cap\Fbin$, with $q_0=0$.\\
@@ -88,7 +89,7 @@ $\mathbf{r},m$ & Route vector $\mathbf{r}=\langle v_1=0,v_2,\ldots,v_{m-1},v_m=0
 $\mathbf{r}_{\mathcal{C}}$ & Nonempty customer subsequence $\langle v_2,\ldots,v_{m-1}\rangle\in\mathcal{C}^{m-2}$, encoded by each JSON route array.\\
 $\operatorname{arcs}(\mathbf{r})$ & Ordered arc sequence $\langle\langle v_j,v_{j+1}\rangle\rangle_{j=1}^{m-1}$.\\
 $\mathcal{S},|\mathcal{S}|$ & Set of routes forming a solution, and its realized fleet size. For $n=0$, $\mathcal{S}=\emptyset$ is permitted.\\
-$\mathbf{s},\mathbf{r}_k$ & Submitted ordered enumeration $\mathbf{s}=\langle\mathbf{r}_1,\ldots,\mathbf{r}_{|\mathcal{S}|}\rangle$, with route index $k\in\{1,\ldots,|\mathcal{S}|\}$. Duplicate entries are rejected before forming $\mathcal{S}$.\\
+$\mathbf{s}$ & Submitted ordered enumeration of the route vectors, with $|\mathcal{S}|$ entries once validated. Duplicate entries are rejected before forming $\mathcal{S}$.\\
 $\operatorname{canon}(\mathcal{S})$ & Lexicographically sorted enumeration of the validated route set, preserving each route's internal customer order.\\
 $c_{\mathbf{r}},C(\mathcal{S}),C$ & Route cost, solution routing cost and current exact accumulator, in $\Q_{\geq0}$ for exact profiles.\\
 $u_j,t_j,d_j$ & Arrival at customer $j$, service start and departure after service. When a window is present, $t_j=\max(u_j,e_j)$ and $t_j\leq l_j$. In both settings $d_j=t_j+s_j$.\\
@@ -96,12 +97,17 @@ $d_0$ & Initial depot departure. For the earliest static schedule with a depot w
 $[h_0,h_1]$ & Common closed TD arc departure horizon with $0\leq h_0<h_1$. Every arc departure lies within it. Route constraints may restrict feasible initial departures to a single time.\\
 $\alpha_{ij}(t)$ & Arrival clock time at $j$ after entering directed arc $(i,j)$ at time $t$. The difference $\alpha_{ij}(t)-t$ is its travel time.\\
 $(x_k,y_k)$ & Stored departure abscissa and arrival ordinate of the $k$th knot on one ATF. Both are finite binary64 operands.\\
-$y^-(x),y^+(x)$ & First and last stored ordinates at abscissa $x$. The first is attained at $x$. The last is the right-hand limit whenever a following piece exists.\\
+$\phi_{ij}$ & Number of materialized knots of the ATF of arc $(i,j)$.\\
+$y^-(x),y^+(x)$ & First and last stored ordinates at abscissa $x$, on one ATF or on a retained prefix function. The first is attained at $x$. The last is the right-hand limit whenever a following piece exists.\\
 $D_{\mathbf r},\delta_{\mathbf r}(t)$ & Feasible initial depot departures of route $\mathbf r$ and its return clock time for $t\in D_{\mathbf r}$.\\
+$\mathbf r_j,\delta_{\mathbf r_j}$ & Prefix $\langle v_1,\ldots,v_j\rangle$ of $\mathbf r$ and its ready-time function, i.e. the vehicle clock after $v_j$ as a function of the initial departure, with $\delta_{\mathbf r_m}=\delta_{\mathbf r}$.\\
+$\zeta,t_\zeta$ & A time boundary, such as a window bound, horizon end or arc knot, and the initial departure at which a prefix clock reaches it.\\
+$\varepsilon,\gamma$ & Positive displacement of the initial departure in the event sweep, and the nonnegative rate of a clock with respect to it.\\
 $\Delta_{\mathbf r}^*,t_{\mathbf r}^*$ & Minimum elapsed route duration and earliest feasible departure attaining it, defined for a feasible route by Equations~\ref{eq:td-route-duration} and~\ref{eq:td-earliest-minimizer}.\\
-$F$ & Fixed charge per used vehicle in the TD objective \id{FleetCostDuration}. Its unit is the instance's duration unit. The same letter in Equation~\ref{eq:binary64-normal} denotes the binary64 fraction field.\\
+$F$ & Fixed charge per used vehicle in the TD objective \id{FleetCostDuration}. Its unit is the instance's duration unit.\\
 $\widehat C$ & Rounded binary64 projection $\RoundBinary(C)\in\FbinExt$. Only a finite value is emitted as numeric compatibility \id{cost}.\\
-$S,b,d$ & Positive integer scaling factor $S$, binary-scale exponent $b\in\mathbb{N}_0$ and decimal precision $d\in\mathbb{N}_0$. Typical scales are $2^b$ and $10^d$.\\
+$b,d$ & Binary-scale exponent $b\in\mathbb{N}_0$ and decimal precision $d\in\mathbb{N}_0$, with scales $2^b$ and $10^d$. A tick is the unit $2^{-b}$ of the common static scale.\\
+$c_{\max},s_{\max},e_{\max},l_{\max},B$ & Largest arc cost, service duration, opening time and closing time of an instance, with zeros for absent temporal fields, and the bound $B$ in ticks on the sums of a static evaluation.\\
 $p,q,\ell,\rho$ & In Algorithm~\ref{alg:quantize}, rational numerator $p\in\mathbb{Z}$, denominator $q\in\mathbb{Z}_{>0}$, division quotient $\ell\in\mathbb{Z}$ and integer remainder $0\leq\rho<q$. The denominator $q$ is distinct from a customer demand $q_i$.\\
 $N$ & Number of vertices, $N=n+1$, in the canonical materialization streams.\\
 \end{longtable}
