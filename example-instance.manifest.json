@@ -10,7 +10,6 @@
     "cost": "fixture-unit",
     "time": "fixture-unit"
   },
-  "cost_is_travel_time": true,
   "instance": {
     "path": "example-instance.json",
     "sha256": "9f28bdca3e244bea3d6b849ae914d592ae20660503f1176c714f0e3d7c209679"

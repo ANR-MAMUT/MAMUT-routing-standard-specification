@@ -10,7 +10,7 @@
     "standard": {
       "specification": "mamut-routing/0.1",
       "benchmark_revision": "r1",
-      "manifest_sha256": "62c3f1d4c85454eab23e376ef66524183bc5ac3ff886152d644ef68d0c25ad11",
+      "manifest_sha256": "c3f68c5d73dbfdcc23cad9706007c784e11ec7f1ebc89746b9f75e624c17bdb2",
       "profile": "binary64-exact-v1",
       "objective": "MonoCost",
       "num_routes": 1,

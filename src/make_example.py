@@ -59,7 +59,7 @@ def generate():
     manifest = dict(specification=SPECIFICATION, family="SyntheticExample",
                     benchmark_revision="r1", instance_name="two-customers",
                     problem=problem, objective=objective, default_profile=profile,
-                    units=dict(cost="fixture-unit", time="fixture-unit"), cost_is_travel_time=True,
+                    units=dict(cost="fixture-unit", time="fixture-unit"),
                     instance=identify(instance_path), sidecars=[],
                     materialization=dict(kind="embedded-matrix", interpretation="binary64",
                                          matrix_sha256=ref.matrix_digest(instance["matrix"], "binary64")),
